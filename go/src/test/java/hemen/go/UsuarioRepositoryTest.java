@@ -20,15 +20,15 @@ class UsuarioRepositoryTest {
     @Test
     void guardarUsuarioYBuscarPorEmail() {
     	User usuario = new User();
-        usuario.setNombre("Ane");
-        usuario.setApellidos("");
-        usuario.setFechaNacimiento(LocalDate.of(1990, 5, 12));
-        usuario.setEmail("ane@example.com");
-        usuario.setContrasena("secreta123");
+        usuario.setNombre_persona("Ane");
+        usuario.setApellidos_persona("");
+        usuario.setFec_nacimiento_persona(LocalDate.of(1990, 5, 12));
+        usuario.setEmailPersona("ane@example.com");
+        usuario.setPass_persona("secreta123");
 
         usuarioRepository.save(usuario);
 
-        boolean existe = usuarioRepository.existsByEmail("an5e@example.com");
+        boolean existe = usuarioRepository.existsByEmailPersona("an5e@example.com");
         assertThat(existe).isTrue();
     }
 }
