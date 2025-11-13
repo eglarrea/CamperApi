@@ -1,15 +1,27 @@
 package hemen.go.dto.response;
 
-public class JwtResponse {
-	 private String token;
+import java.util.Optional;
 
+public class JwtResponse {
+	 	private String token;
+	 	private UserDtoResponse user;
+	 	
 	    public JwtResponse() {}
 
-	    public JwtResponse(String token) {
+	    public JwtResponse(String token, UserDtoResponse user) {
 	        this.token = token;
+	        this.user = user;
 	    }
 
-	    public String getToken() {
+	    public UserDtoResponse getUser() {
+			return user;
+		}
+
+		public void setUser(UserDtoResponse user) {
+			this.user = user;
+		}
+
+		public String getToken() {
 	        return token;
 	    }
 
