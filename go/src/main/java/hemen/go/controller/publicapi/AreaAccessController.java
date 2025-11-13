@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hemen.go.model.QrRequest;
 
+
 @RestController
 @RequestMapping("/api/public")
 public class AreaAccessController {
