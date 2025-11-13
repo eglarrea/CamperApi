@@ -1,0 +1,5 @@
+﻿*.prefs
+go/target
+go/.env
+go/.classpath
+go/.project
