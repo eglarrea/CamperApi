@@ -21,57 +21,98 @@ import hemen.go.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Controlador REST público para la autenticación de usuarios.
+ *
+ * Endpoints expuestos bajo la ruta "/api/public/auth".
+ * 
+ * Funcionalidades principales:
+ *  - Login de usuarios con email y contraseña.
+ *  - Retorno de un token JWT junto con los datos del usuario autenticado.
+ *  - Manejo de errores de credenciales inválidas con mensajes internacionalizados.
+ */
 @RestController
 @RequestMapping("/api/public/auth")
 public class AuthController {
-	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    // Logger para registrar eventos y errores
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    // Servicios necesarios para autenticación y gestión de usuarios
     private final AuthService authService;
     private final UserService userService;
+
+    // Fuente de mensajes para internacionalización (i18n)
     private final MessageSource messageSource;
 
+    /**
+     * Constructor con inyección de dependencias.
+     *
+     * @param authService servicio de autenticación (login, registro, generación de JWT).
+     * @param userService servicio de gestión de usuarios (consultas, datos).
+     * @param messageSource fuente de mensajes para internacionalización.
+     */
     public AuthController(AuthService authService, UserService userService, MessageSource messageSource) {
         this.authService = authService;
         this.userService = userService;
         this.messageSource = messageSource;
     }
 
-    /*@PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    	 try {
-    	        String token = authService.authenticate(request.getEmail(), request.getPassword());
-    	        return ResponseEntity.ok(new JwtResponse(token));
-    	    } catch (BadCredentialsException e) {
-    	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-    	                             .body("Credenciales inválidas");
-    	    }
-    }*/
-
+    /**
+     * Endpoint POST para login de usuarios.
+     *
+     * Flujo:
+     *  1. Recibe un objeto LoginRequest con email y contraseña.
+     *  2. Llama a AuthService.authenticate() para validar credenciales y generar token JWT.
+     *  3. Recupera los datos del usuario con UserService.findByEmail().
+     *  4. Devuelve un objeto JwtResponse con el token y los datos del usuario.
+     *
+     * Manejo de errores:
+     *  - Si las credenciales son inválidas, se captura BadCredentialsException.
+     *  - Se registra el error en el log.
+     *  - Se devuelve un mensaje internacionalizado (auth.invalid.credentials) con estado HTTP 401.
+     *
+     * @param request objeto con email y contraseña.
+     * @return ResponseEntity con JwtResponse si éxito, o mensaje de error si fallo.
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
+            // Autenticación y generación de token
             String token = authService.authenticate(request.getEmail(), request.getPassword());
-            
+
             // Recuperar datos del usuario
             UserDtoResponse user = userService.findByEmail(request.getEmail());
 
             // Retornar token + datos del usuario
             return ResponseEntity.ok(new JwtResponse(token, user));
         } catch (BadCredentialsException e) {
-        	logger.error("Credenciales no válidas para email: {} y password: {}", request.getEmail(), request.getPassword());
-        	String mensaje = messageSource.getMessage(
-                    "auth.invalid.credentials",   // clave en messages.properties
-                    null,                         // parámetros opcionales
-                    LocaleContextHolder.getLocale() // detecta el idioma del cliente
-                );
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
+            // Log de error con credenciales inválidas
+            logger.error("Credenciales no válidas para email: {} y password: {}", request.getEmail(), request.getPassword());
+
+            // Mensaje internacionalizado según el idioma del cliente
+            String mensaje = messageSource.getMessage(
+                "auth.invalid.credentials",   // clave definida en messages.properties
+                null,                         // parámetros opcionales
+                LocaleContextHolder.getLocale() // detecta el idioma del cliente
+            );
+
+            // Respuesta con estado 401 Unauthorized
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
         }
     }
-  /*  @PostMapping("/register")
+
+    /*
+    // Ejemplo de endpoint para registro de usuarios (actualmente comentado).
+    @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-	     if (!request.getPassPersona().equals(request.getConfirmPassPersona())) {
-	        throw new IllegalArgumentException("Las contraseñas no coinciden");
-	    }
+        // Validación de contraseñas
+        if (!request.getPassPersona().equals(request.getConfirmPassPersona())) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
+        // Registro del usuario
         authService.register(request);
         return ResponseEntity.ok("Usuario registrado correctamente");
-    }*/
+    }
+    */
 }

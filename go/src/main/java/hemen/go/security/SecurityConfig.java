@@ -12,42 +12,90 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-
-
+/**
+ * Configuración principal de seguridad para la aplicación Hemengo.
+ *
+ * Esta clase define cómo se gestionan la autenticación y autorización
+ * en la aplicación usando Spring Security y JWT.
+ *
+ * Funcionalidades principales:
+ *  - Deshabilitar CSRF (no necesario en APIs REST).
+ *  - Definir qué endpoints son públicos y cuáles requieren autenticación.
+ *  - Configurar la política de sesiones como STATELESS (sin sesiones en servidor).
+ *  - Registrar el filtro JWT antes del filtro estándar de autenticación.
+ *  - Proporcionar un AuthenticationManager para manejar autenticaciones.
+ *  - Definir un PasswordEncoder seguro (BCrypt).
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-	 private final JwtFilter jwtFilter;
+    /** Filtro JWT que valida tokens en cada petición */
+    private final JwtFilter jwtFilter;
 
-	    public SecurityConfig(JwtFilter jwtFilter) {
-	        this.jwtFilter = jwtFilter;
-	    }
+    /**
+     * Constructor con inyección de dependencias.
+     *
+     * @param jwtFilter filtro JWT para validar tokens en las peticiones.
+     */
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
-	    @Bean
-	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	        http.csrf(csrf -> csrf.disable())
-	            .authorizeHttpRequests(auth -> auth
-	                .requestMatchers("/api/public/**").permitAll()
-	                .requestMatchers("/api/secure/**").authenticated()
-	            )
-	            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    /**
+     * Define la cadena de filtros de seguridad.
+     *
+     * Configuración:
+     *  - CSRF deshabilitado (no necesario en APIs REST).
+     *  - Endpoints bajo "/api/public/**" accesibles sin autenticación.
+     *  - Endpoints bajo "/api/secure/**" requieren autenticación.
+     *  - Sesiones configuradas como STATELESS (cada petición debe incluir JWT).
+     *  - Se añade el filtro JWT antes del filtro estándar UsernamePasswordAuthenticationFilter.
+     *
+     * @param http objeto HttpSecurity para configurar seguridad.
+     * @return SecurityFilterChain configurado.
+     * @throws Exception en caso de error de configuración.
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/secure/**").authenticated()
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-	        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        // Añadir filtro JWT antes del filtro estándar
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-	        return http.build();
-	    }
+        return http.build();
+    }
 
-	    @Bean
-	    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-	        return authenticationConfiguration.getAuthenticationManager();
-	    }
+    /**
+     * Bean para obtener el AuthenticationManager.
+     *
+     * - Se usa para autenticar usuarios en el sistema.
+     * - Se obtiene desde AuthenticationConfiguration.
+     *
+     * @param authenticationConfiguration configuración de autenticación.
+     * @return AuthenticationManager configurado.
+     * @throws Exception en caso de error.
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
-	    // También necesitas un PasswordEncoder
-	    @Bean
-	    public PasswordEncoder passwordEncoder() {
-	        return new BCryptPasswordEncoder();
-	    }
+    /**
+     * Bean para codificar contraseñas.
+     *
+     * - Se usa BCryptPasswordEncoder, un algoritmo seguro y recomendado.
+     * - Garantiza que las contraseñas se almacenen de forma segura en la base de datos.
+     *
+     * @return PasswordEncoder basado en BCrypt.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
-
