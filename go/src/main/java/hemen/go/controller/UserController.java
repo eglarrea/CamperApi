@@ -2,7 +2,7 @@ package hemen.go.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import hemen.go.entity.User;
+import hemen.go.entity.Usuario;
 import hemen.go.repository.UsuarioRepository;
 
 import org.springframework.validation.annotation.Validated;
@@ -19,12 +19,12 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> listar() {
+    public List<Usuario> listar() {
         return usuarioRepository.findAll();
     }
 
     @PostMapping
-    public User crear(@Validated @RequestBody User usuario) {
+    public Usuario crear(@Validated @RequestBody Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 }

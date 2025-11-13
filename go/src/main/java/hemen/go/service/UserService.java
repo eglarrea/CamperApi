@@ -4,7 +4,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import hemen.go.dto.response.UserDtoResponse;
-import hemen.go.entity.User;
+import hemen.go.entity.Usuario;
 import hemen.go.repository.UsuarioRepository;
 
 /**
@@ -51,7 +51,7 @@ public class UserService {
      * @throws UsernameNotFoundException si el usuario no existe.
      */
     public UserDtoResponse findByEmail(String email) {
-        User user = usuarioRepository.findByEmailPersona(email)
+        Usuario user = usuarioRepository.findByEmailPersona(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
         return new UserDtoResponse(

@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import hemen.go.entity.User;
+import hemen.go.entity.Usuario;
 import hemen.go.repository.UsuarioRepository;
 
 /**
@@ -52,7 +52,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = usuarioRepository.findByEmailPersona(email)
+        Usuario user = usuarioRepository.findByEmailPersona(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
 
         return org.springframework.security.core.userdetails.User

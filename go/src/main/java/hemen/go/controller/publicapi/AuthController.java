@@ -1,5 +1,6 @@
 package hemen.go.controller.publicapi;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.MessageSource;
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import hemen.go.dto.request.LoginRequest;
+import hemen.go.dto.request.RegisterRequest;
 import hemen.go.dto.response.JwtResponse;
 import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.service.AuthService;
 import hemen.go.service.UserService;
+import jakarta.validation.ConstraintViolationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,17 +105,20 @@ public class AuthController {
         }
     }
 
-    /*
-    // Ejemplo de endpoint para registro de usuarios (actualmente comentado).
+    
+    
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        // Validación de contraseñas
-        if (!request.getPassPersona().equals(request.getConfirmPassPersona())) {
-            throw new IllegalArgumentException("Las contraseñas no coinciden");
+    	try {
+    		authService.register(request);
+    		return ResponseEntity.ok("Usuario registrado correctamente");
+    	} catch (ConstraintViolationException e) {
+    		List<String> errores = e.getConstraintViolations().stream()
+    		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
+    		            " (valor: " + v.getInvalidValue() + ")").toList();
+
+    		return ResponseEntity.badRequest().body(errores);
         }
-        // Registro del usuario
-        authService.register(request);
-        return ResponseEntity.ok("Usuario registrado correctamente");
     }
-    */
+    
 }

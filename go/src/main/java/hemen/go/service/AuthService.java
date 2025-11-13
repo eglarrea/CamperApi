@@ -5,8 +5,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import hemen.go.dto.request.RegisterRequest;
+import hemen.go.entity.Usuario;
+import hemen.go.repository.UsuarioRepository;
 import hemen.go.security.JwtUtil;
 
 /**
@@ -24,14 +28,15 @@ import hemen.go.security.JwtUtil;
 @Service
 public class AuthService {
 
-    /** Administrador de autenticación de Spring Security */
     private final AuthenticationManager authenticationManager;
 
-    /** Utilidad para generar y validar tokens JWT */
     private final JwtUtil jwtUtil;
 
-    /** Servicio para cargar detalles de usuario (roles, credenciales) */
     private final UserDetailsService userDetailsService;
+    
+    private final PasswordEncoder passwordEncoder;
+    
+    private final UsuarioRepository usuarioRepository;
 
     /**
      * Constructor con inyección de dependencias.
@@ -40,10 +45,12 @@ public class AuthService {
      * @param jwtUtil utilidad para generar y validar tokens JWT.
      * @param userDetailsService servicio para cargar detalles de usuario.
      */
-    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserDetailsService userDetailsService,PasswordEncoder passwordEncoder,UsuarioRepository usuarioRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
+        this.usuarioRepository=usuarioRepository;
     }
 
     /**
@@ -71,11 +78,30 @@ public class AuthService {
         return jwtUtil.generateToken(userDetails);
     }
 
-    /*
-    // Método para registrar nuevos usuarios (actualmente comentado).
+    
+    
     public void register(RegisterRequest request) {
-        // Lógica para guardar un nuevo usuario en la BD.
-        // Encriptar contraseña con BCryptPasswordEncoder antes de persistir.
+    	 // 1. Validar que las contraseñas coincidan
+        if (!request.getPassPersona().equals(request.getConfirmPassPersona())) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
+
+        // 2. Encriptar la contraseña
+        String encodedPassword = passwordEncoder.encode(request.getPassPersona());
+
+        // 3. Crear entidad User
+        Usuario user = new Usuario();
+        user.setNombre_persona(request.getNombrePersona());
+        user.setApellidos_persona(request.getApellidosPersona());
+        user.setFec_nacimiento_persona(request.getFecNacimientoPersona());
+        user.setDni_persona(request.getDniPersona());
+        user.setIban_persona(request.getIbanPersona());
+        user.setEmailPersona(request.getEmailPersona());
+        user.setPass_persona(encodedPassword);
+        user.setIs_admin(request.isAdmin());
+
+        // 4. Guardar en la base de datos
+        usuarioRepository.save(user);
     }
-    */
+    
 }

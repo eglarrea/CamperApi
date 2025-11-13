@@ -5,13 +5,17 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "persona")
-public class User {
+@Table(name = "\"personas\"")
+public class Usuario {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "persona_seq", sequenceName = "persona_id_persona_seq", allocationSize = 1)
-    @Column(name="id_persona")
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "persona_seq")
+	@SequenceGenerator(
+	    name = "persona_seq",
+	    sequenceName = "persona_id_persona_seq",
+	    allocationSize = 1
+	)
+	@Column(name = "id_persona")
     private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")
