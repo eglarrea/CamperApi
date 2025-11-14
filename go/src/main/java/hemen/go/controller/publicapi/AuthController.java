@@ -24,6 +24,8 @@ import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.service.AuthService;
 import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 /**
@@ -81,7 +83,17 @@ public class AuthController {
      * @return ResponseEntity con JwtResponse si éxito, o mensaje de error si fallo.
      */
     @PostMapping("/login")
-    @Operation(summary = "Loguearse a al api")
+    @Operation(
+        summary = "Loguearse en la API",
+        description = "Permite a un usuario autenticarse con su email y contraseña. " +
+                      "Si las credenciales son válidas, devuelve un token JWT junto con los datos del usuario."
+    )
+    @ApiResponses(value = {
+        @ApiResponse (responseCode = "200", description = "Autenticación exitosa. Devuelve token y datos del usuario"),
+        @ApiResponse(responseCode = "400", description = "Solicitud inválida. El cuerpo de la petición no cumple el formato esperado"),
+        @ApiResponse(responseCode = "401", description = "Credenciales incorrectas. No autorizado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor durante la autenticación")
+    })
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             // Autenticación y generación de token
@@ -107,7 +119,17 @@ public class AuthController {
     
     
     @PostMapping("/register")
-    @Operation(summary = "Registrarse en la aplicacion")
+    @Operation(
+        summary = "Registrarse en la aplicación",
+        description = "Permite a un nuevo usuario registrarse en la aplicación enviando sus datos personales. "
+                    + "Si los datos son válidos y no existe un usuario con el mismo email, se crea el registro."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
+        @ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
+    })
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request, BindingResult result) {
     	try {
     		if (result.hasErrors()) {
