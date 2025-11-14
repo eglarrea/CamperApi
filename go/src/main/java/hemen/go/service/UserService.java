@@ -62,7 +62,7 @@ public class UserService {
                 user.getDni_persona(),
                 user.getIban_persona(),
                 user.getEmailPersona(),
-                user.isIs_admin(),
+                user.is_admin(),
                 user.getEmpresa() != null ? user.getEmpresa().getNombreEmpresa() : null
         );
     }

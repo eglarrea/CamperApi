@@ -2,6 +2,9 @@ package hemen.go;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.validation.Validator;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -13,8 +16,12 @@ import io.github.cdimascio.dotenv.Dotenv;
  * - Configura propiedades del sistema para la conexión a la base de datos.
  */
 @SpringBootApplication
-public class HemengoApplication {
-
+public class HemengoApplication implements WebMvcConfigurer {
+	/*private final LocalValidatorFactoryBean validator;
+	
+	public HemengoApplication(LocalValidatorFactoryBean validator) {
+        this.validator = validator;
+    }*/
     /**
      * Método main: punto de entrada de la aplicación.
      *
@@ -39,15 +46,25 @@ public class HemengoApplication {
      * @param args argumentos de línea de comandos (opcional).
      */
     public static void main(String[] args) {
-        // Para desarrollo: carga variables desde .env
-        Dotenv dotenv = Dotenv.load();
+    	// Cargar dotenv en local, ignorar si no existe (producción)
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+
+        // Para cada variable, primero intenta leer de .env, si no existe usa System.getenv
+        String dbUrl = dotenv.get("DB_URL", System.getenv("DB_URL"));
+        String dbUsername = dotenv.get("DB_USERNAME", System.getenv("DB_USERNAME"));
+        String dbPassword = dotenv.get("DB_PASSWORD", System.getenv("DB_PASSWORD"));
 
         // Configuración de propiedades del sistema para la base de datos
-        System.setProperty("DB_URL", dotenv.get("DB_URL"));
-        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
-        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+        System.setProperty("DB_URL", dbUrl);
+        System.setProperty("DB_USERNAME", dbUsername);
+        System.setProperty("DB_PASSWORD", dbPassword);
 
         // Arranca la aplicación Spring Boot
         SpringApplication.run(HemengoApplication.class, args);
     }
+    
+/*    @Override
+    public Validator getValidator() {
+        return validator;
+    }*/
 }

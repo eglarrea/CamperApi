@@ -1,5 +1,9 @@
 package hemen.go.service;
 
+import java.time.LocalDate;
+
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,6 +41,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     
     private final UsuarioRepository usuarioRepository;
+    
+    private final MessageSource messageSource;
 
     /**
      * Constructor con inyección de dependencias.
@@ -45,12 +51,15 @@ public class AuthService {
      * @param jwtUtil utilidad para generar y validar tokens JWT.
      * @param userDetailsService servicio para cargar detalles de usuario.
      */
-    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserDetailsService userDetailsService,PasswordEncoder passwordEncoder,UsuarioRepository usuarioRepository) {
+    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, 
+    					UserDetailsService userDetailsService,PasswordEncoder passwordEncoder,
+    					UsuarioRepository usuarioRepository, MessageSource messageSource) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository=usuarioRepository;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -83,7 +92,14 @@ public class AuthService {
     public void register(RegisterRequest request) {
     	 // 1. Validar que las contraseñas coincidan
         if (!request.getPassPersona().equals(request.getConfirmPassPersona())) {
-            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        	 String mensaje = messageSource.getMessage(
+                     "error.password.usuario", null, LocaleContextHolder.getLocale());
+            throw new IllegalArgumentException(mensaje);
+        }
+        if (null!= request.getFecNacimientoPersona() && request.getFecNacimientoPersona().plusYears(18).isAfter(LocalDate.now())) {
+        	String mensaje = messageSource.getMessage(
+                     "user.birthdate.past", null, LocaleContextHolder.getLocale());
+            throw new IllegalArgumentException(mensaje);
         }
 
         // 2. Encriptar la contraseña
@@ -98,7 +114,7 @@ public class AuthService {
         user.setIban_persona(request.getIbanPersona());
         user.setEmailPersona(request.getEmailPersona());
         user.setPass_persona(encodedPassword);
-        user.setIs_admin(request.isAdmin());
+        user.setIs_admin(false);
 
         // 4. Guardar en la base de datos
         usuarioRepository.save(user);

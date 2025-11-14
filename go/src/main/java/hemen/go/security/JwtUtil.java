@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
@@ -29,7 +30,21 @@ public class JwtUtil {
      * Clave secreta utilizada para firmar y validar los tokens JWT.
      * Debe tener al menos 256 bits (32 caracteres si se usa ASCII).
      */
-    private final Key SECRET_KEY = Keys.hmacShaKeyFor("claveSecretaMuySegura12345678901234567890".getBytes());
+    private final Key SECRET_KEY;
+
+    public JwtUtil() {
+        // Cargar dotenv en local, ignorar si no existe (producción)
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+
+        // Primero intenta leer de .env, si no existe usa System.getenv
+        String secret = dotenv.get("JWT_SECRET", System.getenv("JWT_SECRET"));
+
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException("JWT_SECRET no definido o demasiado corto (mínimo 32 caracteres)");
+        }
+
+        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     /**
      * Genera un token JWT para un usuario.

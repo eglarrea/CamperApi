@@ -1,5 +1,7 @@
 package hemen.go.exception;
 
+import java.util.List;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,5 +38,14 @@ public class GlobalExceptionHandler {
                 LocaleContextHolder.getLocale()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
+    }
+    
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public ResponseEntity<List<String>> handleConstraintViolation(jakarta.validation.ConstraintViolationException ex) {
+        List<String> errores = ex.getConstraintViolations().stream()
+            .map(v -> v.getMessage())
+            .toList();
+
+        return ResponseEntity.badRequest().body(errores);
     }
 }

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "\"personas\"")
+@Table(name = "personas")
 public class Usuario {
 
 	@Id
@@ -18,35 +18,34 @@ public class Usuario {
 	@Column(name = "id_persona")
     private Long id;
 
-    @NotBlank(message = "El nombre es obligatorio")
+    @NotBlank(message = "{user.name.required}")
     private String nombre_persona;
 
-    @NotBlank(message = "Los apellidos son obligatorios")
+    @NotBlank(message = "{user.lastname.required}")
     private String apellidos_persona;
 
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
-    @Past(message = "La fecha debe estar en el pasado")
+    @NotNull(message = "{user.birthdate.required}")
     private LocalDate fec_nacimiento_persona;
 
-    @Pattern(regexp = "^[0-9]{8}[A-Z]$", message = "El DNI debe tener 8 números y una letra")
+    @Pattern(regexp = "^[0-9]{8}[A-Z]$", message = "{user.dni.invalid}")
     private String dni_persona;
 
-    @Pattern(regexp = "^ES[0-9]{22}$", message = "El IBAN debe ser válido y comenzar con ES")
+    @Pattern(regexp = "^ES[0-9]{22}$", message = "{user.iban.invalid}")
     private String iban_persona;
 
-    @NotBlank(message = "El email es obligatorio")
-    @Email(message = "El email debe tener un formato válido")
+    @NotBlank(message = "{user.email.required}")
+    @Email(message = "{user.email.invalid}")
     @Column(name = "email_persona")
     private String emailPersona;
 
-    @NotBlank(message = "La contraseña es obligatoria")
+    @NotBlank(message ="{user.password.required}")
     private String pass_persona;
     
     private boolean is_admin;
 
     // Relación con la otra tabla
     @ManyToOne
-    @JoinColumn(name = "id_empresa_persona", referencedColumnName = "id_empresa_persona")
+    @JoinColumn(name = "id_empresa_persona", referencedColumnName = "id_empresa")
     private Empresa empresa;
 
     // Getters y setters
@@ -95,7 +94,7 @@ public class Usuario {
 	public void setPass_persona(String pass_persona) {
 		this.pass_persona = pass_persona;
 	}
-	public boolean isIs_admin() {
+	public boolean is_admin() {
 		return is_admin;
 	}
 	public void setIs_admin(boolean is_admin) {

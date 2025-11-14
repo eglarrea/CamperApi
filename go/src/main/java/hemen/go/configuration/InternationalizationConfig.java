@@ -31,7 +31,7 @@ public class InternationalizationConfig {
      *
      * @return instancia de MessageSource configurada para i18n.
      */
-    @Bean
+	@Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
@@ -51,9 +51,9 @@ public class InternationalizationConfig {
      * @return instancia de LocalValidatorFactoryBean con soporte de i18n.
      */
     @Bean
-    public LocalValidatorFactoryBean getValidator() {
+    public LocalValidatorFactoryBean validator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setValidationMessageSource(messageSource());
+        bean.setValidationMessageSource(messageSource);
         return bean;
     }
 }

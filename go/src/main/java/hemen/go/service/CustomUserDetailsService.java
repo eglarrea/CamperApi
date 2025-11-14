@@ -54,11 +54,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario user = usuarioRepository.findByEmailPersona(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
-
+        String role = user.is_admin() ? "ADMIN" : "USER";
+        
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmailPersona()) // usamos email como username
                 .password(user.getPass_persona())     // contraseña encriptada con BCrypt
-                //.roles(user.getRole())              // opcional: añadir roles si están definidos
+                .roles(role)              // opcional: añadir roles si están definidos
                 .build();
     }
 }
