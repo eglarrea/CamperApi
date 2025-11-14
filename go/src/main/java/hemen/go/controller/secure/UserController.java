@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 
 @RestController
@@ -33,13 +34,15 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Obtener usuario por ID",
-        description = "Este endpoint permite a un administrador obtener los datos de un usuario específico mediante su ID."
+        description = "Este endpoint permite a un administrador obtener los datos de un usuario específico mediante su ID.",
+   		security = { @SecurityRequirement (name = "bearerAuth") }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Usuario encontrado correctamente"),
         @ApiResponse(responseCode = "403", description = "Acceso denegado. Solo administradores pueden usar este endpoint"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado con el ID proporcionado")
     })
+   
     public Usuario getUserById(@PathVariable Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
@@ -53,7 +56,8 @@ public class UserController {
     @Operation(
         summary = "Obtener datos del usuario autenticado",
         description = "Devuelve la información del usuario actualmente autenticado en el sistema. " +
-                      "Disponible para roles USER y ADMIN."
+                      "Disponible para roles USER y ADMIN.",
+        security = { @SecurityRequirement (name = "bearerAuth") }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Datos del usuario obtenidos correctamente"),
