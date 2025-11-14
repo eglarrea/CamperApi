@@ -23,6 +23,7 @@ import hemen.go.dto.response.JwtResponse;
 import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.service.AuthService;
 import hemen.go.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 /**
@@ -80,6 +81,7 @@ public class AuthController {
      * @return ResponseEntity con JwtResponse si éxito, o mensaje de error si fallo.
      */
     @PostMapping("/login")
+    @Operation(summary = "Loguearse a al api")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             // Autenticación y generación de token
@@ -105,6 +107,7 @@ public class AuthController {
     
     
     @PostMapping("/register")
+    @Operation(summary = "Registrarse en la aplicacion")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request, BindingResult result) {
     	try {
     		if (result.hasErrors()) {

@@ -62,12 +62,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                // Swagger y OpenAPI deben ser públicos
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-resources/**",
+                    "/webjars/**"
+                ).permitAll()
+
+                // Endpoints públicos de tu API
                 .requestMatchers("/api/public/**").permitAll()
+
+                // Endpoints seguros
                 .requestMatchers("/api/secure/**").authenticated()
+
+                // cualquier otro endpoint requiere autenticación
+                .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // Añadir filtro JWT antes del filtro estándar
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
