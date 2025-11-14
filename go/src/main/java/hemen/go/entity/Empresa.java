@@ -4,12 +4,12 @@ import jakarta.validation.constraints.*;
 
 
 @Entity
-@Table(name = "persona")
+@Table(name = "empresas")
 public class Empresa {
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "empresa_seq")
     @SequenceGenerator(name = "empresa_seq", sequenceName = "empresa_id_empresa_seq", allocationSize = 1)
-    @Column(name = "id_empresa_persona")
+    @Column(name = "id_empresa")
     private Integer id;
 
     @Column(name = "nombre_empresa", length = 50, nullable = false)
