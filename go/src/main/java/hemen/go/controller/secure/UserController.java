@@ -1,17 +1,22 @@
 package hemen.go.controller.secure;
 
-import java.util.Optional;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import hemen.go.dto.request.RegisterRequest;
 import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.entity.Usuario;
 import hemen.go.repository.UsuarioRepository;
+import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -21,10 +26,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/user")
 public class UserController {
 
-    private final UsuarioRepository usuarioRepository;
+    //private final UsuarioRepository usuarioRepository;
+    private final UserService userService;
 
-    public UserController(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -44,8 +50,7 @@ public class UserController {
     })
    
     public Usuario getUserById(@PathVariable Long id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
+    	return userService.getUserById(id);
     }
 
     /**
@@ -61,13 +66,13 @@ public class UserController {
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Datos del usuario obtenidos correctamente"),
-        @ApiResponse(responseCode = "401", description = "No autenticado. Se requiere un token válido"),
         @ApiResponse(responseCode = "403", description = "Acceso denegado. El rol no tiene permisos"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado en la base de datos")
     })
     public Usuario getMyData(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails) {
-        return usuarioRepository.findByEmailPersona(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    	return userService.getMyData(userDetails.getUsername());
+        /*return usuarioRepository.findByEmailPersona(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));*/
     }
 
     /**
@@ -87,15 +92,35 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = "Acceso denegado. El rol no tiene permisos"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado en la base de datos")
     })
-    public UserDtoResponse updateMyData(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
-                                @RequestBody RegisterRequest updatedData) {
-    	Usuario usuario = usuarioRepository.findByEmailPersona(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public UserDtoResponse updateMyData(
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
+            @RequestBody RegisterRequest updatedData) {
+    	return userService.updateUserData(userDetails.getUsername(), updatedData);
+        /*Usuario usuario = usuarioRepository.findByEmailPersona(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        usuario.setNombre_persona(updatedData.getNombrePersona());
-        usuario.setEmailPersona(updatedData.getEmailPersona());
-        // añade aquí los campos que quieras actualizar
+        // Actualizar solo si el campo no es nulo y ha cambiado
+        if (updatedData.getNombrePersona() != null 
+                && !updatedData.getNombrePersona().equals(usuario.getNombre_persona())) {
+            usuario.setNombre_persona(updatedData.getNombrePersona());
+        }
+
+        if (updatedData.getEmailPersona() != null 
+                && !updatedData.getEmailPersona().equals(usuario.getEmailPersona())) {
+            usuario.setEmailPersona(updatedData.getEmailPersona());
+        }
+
+        // Validar y actualizar contraseña solo si se ha enviado y coincide con confirmación
+        if (updatedData.getPassPersona() != null && !updatedData.getPassPersona().isBlank()) {
+            if (!updatedData.getPassPersona().equals(updatedData.getConfirmPassPersona())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La confirmación de la contraseña no coincide");
+            }
+            String encodedPassword = passwordEncoder.encode(updatedData.getPassword());
+            usuario.setPassword(encodedPassword);
+        }
+
         Usuario usuario2 = usuarioRepository.save(usuario);
+
         return new UserDtoResponse(
                 usuario2.getId(),
                 usuario2.getNombre_persona(),
@@ -106,7 +131,6 @@ public class UserController {
                 usuario2.getEmailPersona(),
                 usuario2.is_admin(),
                 usuario2.getEmpresa() != null ? usuario2.getEmpresa().getNombreEmpresa() : null
-        );
-      // return usuarioRepository.save(usuario);
+        );*/
     }
 }
