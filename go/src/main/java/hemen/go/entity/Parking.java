@@ -1,5 +1,7 @@
 package hemen.go.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -15,9 +18,9 @@ import jakarta.persistence.Table;
 public class Parking {
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "parking_seq")
-    @SequenceGenerator(name = "empresa_seq", sequenceName = "parking_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "parking_seq", sequenceName = "parking_id_seq", allocationSize = 1)
     @Column(name = "id_parking")
-    private Integer id;
+    private Long id;
 	
 	// Relación con la otra tabla
     @ManyToOne
@@ -57,11 +60,14 @@ public class Parking {
     @Column(name = "tiene_plazas_vip_parking")
     private boolean tienePlazasVip;
 
-	public Integer getId() {
+    @OneToMany (mappedBy = "parking")
+    private List<Plaza> plazas;
+    
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -159,5 +165,13 @@ public class Parking {
 
 	public void setWeb(String web) {
 		this.web = web;
+	}
+
+	public List<Plaza> getPlazas() {
+		return plazas;
+	}
+
+	public void setPlazas(List<Plaza> plazas) {
+		this.plazas = plazas;
 	}
 }
