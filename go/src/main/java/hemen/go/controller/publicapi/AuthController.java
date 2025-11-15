@@ -53,9 +53,6 @@ public class AuthController {
     // Fuente de mensajes para internacionalización (i18n)
     private final MessageSource messageSource;
     
-    //TODO Esto lo vamos a tener que quitar
-    private final ParkingRepository parkingRepository;
-
     /**
      * Constructor con inyección de dependencias.
      *
@@ -63,11 +60,10 @@ public class AuthController {
      * @param userService servicio de gestión de usuarios (consultas, datos).
      * @param messageSource fuente de mensajes para internacionalización.
      */
-    public AuthController(AuthService authService, UserService userService, MessageSource messageSource, ParkingRepository parkingRepository) {
+    public AuthController(AuthService authService, UserService userService, MessageSource messageSource) {
         this.authService = authService;
         this.userService = userService;
         this.messageSource = messageSource;
-        this.parkingRepository = parkingRepository;
     }
 
     /**
@@ -163,37 +159,6 @@ public class AuthController {
     }
     
     
-    @PostMapping("/parkings")
-    @Operation(
-        summary = "Obtener todos los parkings",
-        description = "Método para obtener todos los parkings dados de alta "
-                    + "Si los datos son válidos y no existe un usuario con el mismo email, se crea el registro."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),
-        @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
-        @ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
-    })
-    public ResponseEntity<?> getParkings() {
-    	try {    		
-    		
-    		return ResponseEntity.ok(parkingRepository.findAll());
-    		
-    	} catch (DataIntegrityViolationException ex) {
-    		  String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale() );
-    	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
-    	} catch (IllegalArgumentException e) {
-                // Log de error con credenciales inválidas
-                logger.error("Datos no validos: {}", e.getMessage());  
-                return ResponseEntity.badRequest().body(e.getMessage());
-    	} catch (jakarta.validation.ConstraintViolationException e) {
-    		List<String> errores = e.getConstraintViolations().stream()
-    		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
-    		            " (valor: " + v.getInvalidValue() + ")").toList();
-
-    		return ResponseEntity.badRequest().body(errores);
-        }
-    }
+    
     
 }
