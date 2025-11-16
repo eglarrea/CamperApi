@@ -101,11 +101,12 @@ public class UserService {
                         "error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
         // Validar y actualizar contraseña solo si se ha enviado y coincide con confirmación
-        if (updatedData.getPassPersona() != null && !updatedData.getPassPersona().isBlank()) {
+        if (updatedData.getPassPersona() != null && !updatedData.getPassPersona().isBlank() && !updatedData.getPassPersona().equals(usuario.getPass_persona())) {
             if (!updatedData.getPassPersona().equals(updatedData.getConfirmPassPersona())) {
             	
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage(
-                        "user.password.confirm", null, LocaleContextHolder.getLocale()));
+            	 String mensaje = messageSource.getMessage(
+                         "user.password.confirm", null, LocaleContextHolder.getLocale());
+                throw new IllegalArgumentException(mensaje);
             }
             String encodedPassword = passwordEncoder.encode(updatedData.getPassPersona());
             usuario.setPass_persona(encodedPassword);
