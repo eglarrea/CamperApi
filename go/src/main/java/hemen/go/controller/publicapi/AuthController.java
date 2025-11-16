@@ -21,7 +21,6 @@ import hemen.go.dto.request.LoginRequest;
 import hemen.go.dto.request.RegisterRequest;
 import hemen.go.dto.response.JwtResponse;
 import hemen.go.dto.response.UserDtoResponse;
-import hemen.go.repository.ParkingRepository;
 import hemen.go.service.AuthService;
 import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -141,7 +140,7 @@ public class AuthController {
     	    }
     		
     		authService.register(request);
-    		return ResponseEntity.ok("Usuario registrado correctamente");
+    		return ResponseEntity.ok(messageSource.getMessage("mensage.ok.usuario.creado", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
     		  String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
