@@ -102,7 +102,6 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Datos del usuario actualizados correctamente"),
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
-        @ApiResponse(responseCode = "401", description = "No autenticado. Se requiere un token válido"),
         @ApiResponse(responseCode = "403", description = "Acceso denegado. El rol no tiene permisos"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado en la base de datos")
     })

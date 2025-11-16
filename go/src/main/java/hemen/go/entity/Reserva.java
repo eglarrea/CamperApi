@@ -2,6 +2,8 @@ package hemen.go.entity;
 
 import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,10 +26,12 @@ public class Reserva {
 	
 	@ManyToOne
 	@JoinColumn(name = "id_persona_reserva", referencedColumnName = "id_persona")
+	@JsonIgnoreProperties({"reservas"})
 	private Usuario persona;
 	 
 	@ManyToOne
 	@JoinColumn(name = "id_plaza_reserva", referencedColumnName = "id_plaza")
+	@JsonIgnoreProperties({"reservas"})
 	private Plaza plaza;
 	 
 	@Column(name="fecha_inicio_reserva")
@@ -99,5 +103,13 @@ public class Reserva {
 
 	public void setPlaza(Plaza plaza) {
 		this.plaza = plaza;
+	}
+	
+	public Usuario getPersona() {
+		return persona;
+	}
+
+	public Plaza getPlaza() {
+		return plaza;
 	}
 }

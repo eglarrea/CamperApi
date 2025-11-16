@@ -33,8 +33,10 @@ public class ParkingService {
 	    }
 	 
 	 public List<Parking> findAll() {
-	        
+		 	List<Parking>  listParking = parkingRepository.findAll();
 
-	        return parkingRepository.findAll();
-	    }
+	        return listParking;
+	 }
+	 
+
 }
