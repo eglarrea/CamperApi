@@ -1,36 +1,50 @@
 package hemen.go.controller.secure;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import hemen.go.dto.request.RegisterRequest;
-import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.entity.Usuario;
-import hemen.go.repository.UsuarioRepository;
 import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
+    // Logger para registrar eventos y errores
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     //private final UsuarioRepository usuarioRepository;
     private final UserService userService;
+    
+    // Fuente de mensajes para internacionalización (i18n)
+    private final MessageSource messageSource;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, MessageSource messageSource) {
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -92,45 +106,34 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = "Acceso denegado. El rol no tiene permisos"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado en la base de datos")
     })
-    public UserDtoResponse updateMyData(
+    public ResponseEntity<?> updateMyData(
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
-            @RequestBody RegisterRequest updatedData) {
-    	return userService.updateUserData(userDetails.getUsername(), updatedData);
-        /*Usuario usuario = usuarioRepository.findByEmailPersona(userDetails.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+            @Valid @RequestBody RegisterRequest updatedData , BindingResult result) {
+    	
+    	try {
+    		if (result.hasErrors()) {
+    	        List<String> errores = result.getAllErrors().stream()
+    	            .map(ObjectError::getDefaultMessage) // aquí ya viene interpolado
+    	            .toList();
+    	        return ResponseEntity.badRequest().body(errores);
+    	    }
+    		
+    		userService.updateUserData(userDetails.getUsername(), updatedData);
+    		return ResponseEntity.ok(messageSource.getMessage("mensage.ok.usuario.actualizado", null, LocaleContextHolder.getLocale()));
+    	} catch (DataIntegrityViolationException ex) {
+    		  String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale() );
+    	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
+    	} catch (IllegalArgumentException e) {
+                // Log de error con credenciales inválidas
+                logger.error("Datos no validos: {}", e.getMessage());  
+                return ResponseEntity.badRequest().body(e.getMessage());
+    	} catch (jakarta.validation.ConstraintViolationException e) {
+    		List<String> errores = e.getConstraintViolations().stream()
+    		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
+    		            " (valor: " + v.getInvalidValue() + ")").toList();
 
-        // Actualizar solo si el campo no es nulo y ha cambiado
-        if (updatedData.getNombrePersona() != null 
-                && !updatedData.getNombrePersona().equals(usuario.getNombre_persona())) {
-            usuario.setNombre_persona(updatedData.getNombrePersona());
+    		return ResponseEntity.badRequest().body(errores);
         }
-
-        if (updatedData.getEmailPersona() != null 
-                && !updatedData.getEmailPersona().equals(usuario.getEmailPersona())) {
-            usuario.setEmailPersona(updatedData.getEmailPersona());
-        }
-
-        // Validar y actualizar contraseña solo si se ha enviado y coincide con confirmación
-        if (updatedData.getPassPersona() != null && !updatedData.getPassPersona().isBlank()) {
-            if (!updatedData.getPassPersona().equals(updatedData.getConfirmPassPersona())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La confirmación de la contraseña no coincide");
-            }
-            String encodedPassword = passwordEncoder.encode(updatedData.getPassword());
-            usuario.setPassword(encodedPassword);
-        }
-
-        Usuario usuario2 = usuarioRepository.save(usuario);
-
-        return new UserDtoResponse(
-                usuario2.getId(),
-                usuario2.getNombre_persona(),
-                usuario2.getApellidos_persona(),
-                usuario2.getFec_nacimiento_persona(),
-                usuario2.getDni_persona(),
-                usuario2.getIban_persona(),
-                usuario2.getEmailPersona(),
-                usuario2.is_admin(),
-                usuario2.getEmpresa() != null ? usuario2.getEmpresa().getNombreEmpresa() : null
-        );*/
+       
     }
 }

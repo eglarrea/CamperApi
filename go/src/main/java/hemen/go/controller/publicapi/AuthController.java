@@ -51,7 +51,7 @@ public class AuthController {
 
     // Fuente de mensajes para internacionalización (i18n)
     private final MessageSource messageSource;
-
+    
     /**
      * Constructor con inyección de dependencias.
      *
@@ -140,7 +140,7 @@ public class AuthController {
     	    }
     		
     		authService.register(request);
-    		return ResponseEntity.ok("Usuario registrado correctamente");
+    		return ResponseEntity.ok(messageSource.getMessage("mensage.ok.usuario.creado", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
     		  String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
@@ -156,5 +156,8 @@ public class AuthController {
     		return ResponseEntity.badRequest().body(errores);
         }
     }
+    
+    
+    
     
 }

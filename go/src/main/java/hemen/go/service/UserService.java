@@ -100,26 +100,34 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage(
                         "error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
+        // Validar y actualizar contraseña solo si se ha enviado y coincide con confirmación
+        if (updatedData.getPassPersona() != null && !updatedData.getPassPersona().isBlank() && !updatedData.getPassPersona().equals(usuario.getPass_persona())) {
+            if (!updatedData.getPassPersona().equals(updatedData.getConfirmPassPersona())) {
+            	
+            	 String mensaje = messageSource.getMessage(
+                         "user.password.confirm", null, LocaleContextHolder.getLocale());
+                throw new IllegalArgumentException(mensaje);
+            }
+            String encodedPassword = passwordEncoder.encode(updatedData.getPassPersona());
+            usuario.setPass_persona(encodedPassword);
+        }
+        
         // Actualizar solo si el campo no es nulo y ha cambiado
         if (updatedData.getNombrePersona() != null 
                 && !updatedData.getNombrePersona().equals(usuario.getNombre_persona())) {
             usuario.setNombre_persona(updatedData.getNombrePersona());
         }
 
-        if (updatedData.getEmailPersona() != null 
-                && !updatedData.getEmailPersona().equals(usuario.getEmailPersona())) {
-            usuario.setEmailPersona(updatedData.getEmailPersona());
+        if(updatedData.getIbanPersona() != null && !updatedData.getIbanPersona().equals(usuario.getIban_persona())) {
+        	usuario.setIban_persona(updatedData.getIbanPersona());
         }
-
-        // Validar y actualizar contraseña solo si se ha enviado y coincide con confirmación
-        if (updatedData.getPassPersona() != null && !updatedData.getPassPersona().isBlank()) {
-            if (!updatedData.getPassPersona().equals(updatedData.getConfirmPassPersona())) {
-            	
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage(
-                        "user.password.confirm", null, LocaleContextHolder.getLocale()));
-            }
-            String encodedPassword = passwordEncoder.encode(updatedData.getPassPersona());
-            usuario.setPass_persona(encodedPassword);
+        
+        if(updatedData.getApellidosPersona() != null && !updatedData.getApellidosPersona().equals(usuario.getApellidos_persona())) {
+        	usuario.setApellidos_persona(updatedData.getApellidosPersona());
+        }
+        
+        if(updatedData.getFecNacimientoPersona() != null && !updatedData.getFecNacimientoPersona().equals(usuario.getFec_nacimiento_persona())) {
+        	usuario.setFec_nacimiento_persona(updatedData.getFecNacimientoPersona());
         }
 
         Usuario usua = usuarioRepository.save(usuario);
