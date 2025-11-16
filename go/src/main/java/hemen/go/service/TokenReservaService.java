@@ -37,6 +37,7 @@ public class TokenReservaService {
         return Jwts.builder()
                 .setSubject("reserva-" + reserva.getId())
                 .claim("idPersona", reserva.getPersona().getId())
+                .claim("idParking", reserva.getPlaza().getParking().getId())
                 .claim("idPlaza", reserva.getPlaza().getId())
                 .claim("fecInicio", reserva.getFecInicio())
                 .claim("fecFin", reserva.getFecFin())

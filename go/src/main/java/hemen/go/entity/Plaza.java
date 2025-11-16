@@ -2,6 +2,9 @@ package hemen.go.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +29,7 @@ public class Plaza {
 	// Relación con la otra tabla
     @ManyToOne
     @JoinColumn(name = "id_parking_plaza", referencedColumnName = "id_parking")
+    @JsonIgnore
     private Parking parking;
     
     @Column(name = "nombre_plaza", length = 50, nullable = false)
@@ -57,6 +61,10 @@ public class Plaza {
 
 	public void setParking(Parking parking) {
 		this.parking = parking;
+	}
+	
+	public Parking getParking() {
+		return parking;
 	}
 
 	public String getNombre() {
