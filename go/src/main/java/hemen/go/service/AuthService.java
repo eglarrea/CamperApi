@@ -76,7 +76,7 @@ public class AuthService {
      */
     public String authenticate(String email, String password) {
         // 1. Validar credenciales con Spring Security
-        Authentication authentication = authenticationManager.authenticate(
+        authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(email, password)
         );
 

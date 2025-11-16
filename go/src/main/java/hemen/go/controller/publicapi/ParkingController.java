@@ -9,6 +9,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,11 +42,10 @@ public class ParkingController {
         return ResponseEntity.ok(response);
     }
     
-    @PostMapping("/parkings")
+    @GetMapping("/parkings")
     @Operation(
         summary = "Obtener todos los parkings",
-        description = "Método para obtener todos los parkings dados de alta "
-                    + "Si los datos son válidos y no existe un usuario con el mismo email, se crea el registro."
+        description = "Método para obtener todos los parkings dados de alta."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "personas")
 public class Usuario {
@@ -46,6 +48,7 @@ public class Usuario {
     // Relación con la otra tabla
     @ManyToOne
     @JoinColumn(name = "id_empresa_persona", referencedColumnName = "id_empresa")
+    @JsonIgnore
     private Empresa empresa;
 
     // Getters y setters
@@ -100,9 +103,11 @@ public class Usuario {
 	public void setIs_admin(boolean is_admin) {
 		this.is_admin = is_admin;
 	}
+	
 	public Empresa getEmpresa() {
 		return empresa;
 	}
+	
 	public void setEmpresa(Empresa empresa) {
 		this.empresa = empresa;
 	}
