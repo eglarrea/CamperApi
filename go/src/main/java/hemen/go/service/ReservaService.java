@@ -1,17 +1,17 @@
 package hemen.go.service;
 
+import java.util.List;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import hemen.go.dto.request.ReservaRequest;
-import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.entity.Parking;
 import hemen.go.entity.Plaza;
 import hemen.go.entity.Reserva;
 import hemen.go.entity.Usuario;
-import hemen.go.repository.ParkingRepository;
 import hemen.go.repository.ReservaRepository;
 import hemen.go.repository.UsuarioRepository;
 
@@ -40,6 +40,20 @@ public class ReservaService {
                     "user.iban.invalid", null, LocaleContextHolder.getLocale());
            throw new IllegalArgumentException(mensaje);
         }
+        
+        List<Reserva> solapadas = reservaRepository.findReservasSolapadas(
+                request.getIdPlaza(),
+                request.getIdParking(),
+                request.getFecInicio(),
+                request.getFecFin()
+        );
+
+        if (!solapadas.isEmpty()) {
+            String mensaje = messageSource.getMessage(
+                    "error.reserva.solapada", null, LocaleContextHolder.getLocale());
+            throw new IllegalArgumentException(mensaje);
+        }
+        
         Reserva reserva = new Reserva();
         Plaza plaza = new Plaza();
         Parking parking= new Parking();
