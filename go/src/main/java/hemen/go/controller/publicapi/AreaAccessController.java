@@ -1,37 +1,45 @@
 package hemen.go.controller.publicapi;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import hemen.go.model.QrRequest;
+import hemen.go.dto.request.TokenRequest;
+import hemen.go.security.JwtUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 
 
 @RestController
 @RequestMapping("/api/public")
 public class AreaAccessController {
 
-    @PostMapping("/acceder")
+	private final JwtUtil jwtUtil;
     
-    public ResponseEntity<String> procesarQr(@RequestBody QrRequest request) {
-        String contenido = request.getQrData();
-
-        // Aquí puedes procesar el contenido del QR
-        System.out.println("Contenido del QR recibido: " + contenido);
-
-        // Simulación de respuesta
-        return ResponseEntity.ok("QR procesado correctamente: " + contenido);
+    public AreaAccessController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+       
     }
     
-    
- // Nuevo método GET
-    @GetMapping("/estado")
-    public ResponseEntity<String> obtenerEstado() {
-        // Simulación de estado
-        String estado = "Última lectura: exitosa";
-        return ResponseEntity.ok(estado);
+    @PostMapping("/acceder")
+    public ResponseEntity<?> abrirPuerta(@RequestBody TokenRequest request) {
+        try {
+            Jws<Claims> claims = jwtUtil.validarTokenPuerta(request.getToken());
+
+            Long idParking = claims.getBody().get("idParking", Long.class);
+            if(idParking == request.getIdParking())
+            	return ResponseEntity.ok("Puerta abierta correctamente");
+            else
+            	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Qr no valido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token caducado");
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
+        }
     }
 }

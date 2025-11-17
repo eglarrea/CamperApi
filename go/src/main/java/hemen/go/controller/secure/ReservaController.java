@@ -26,6 +26,7 @@ import com.google.zxing.WriterException;
 
 import hemen.go.dto.request.QrRequest;
 import hemen.go.dto.request.ReservaRequest;
+import hemen.go.entity.Reserva;
 import hemen.go.service.ReservaService;
 import hemen.go.service.TokenReservaService;
 import hemen.go.service.UserService;
@@ -120,9 +121,9 @@ public class ReservaController {
     	    }
     		byte[] qrBytes = null;
     		try {
-    			
-    			//TODO BUSCAR RESERVA POR TOKEN E ID RESERVA
-    			 qrBytes =	tokenReservaService.generarQRBytes(request.getTokenReserva());
+    			Reserva reserva=reservaService.buscarReservaPorReservaForToken(userDetails.getUsername(), request.getIdReserva());
+    			String token=tokenReservaService.generarTokenPuerta(reserva.getPersona().getId(), request.getIdReserva(),reserva.getPlaza().getParking().getId());
+    			qrBytes =	tokenReservaService.generarQRBytes(token);
 			} catch (WriterException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

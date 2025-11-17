@@ -23,8 +23,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 	@Query("SELECT r FROM Reserva r " +
 		       "WHERE r.persona.id = :idUsuario " +
 		       "AND r.id = :idReserva " +
-		       "AND r.token = :token")
-	Optional<Reserva> findByUsuarioAndReservaAndToken(@Param("idUsuario") Long idUsuario,
-		                                                  @Param("idReserva") Long idReserva,
-		                                                  @Param("token") String token);
+		       "AND CURRENT_DATE BETWEEN r.fecInicio AND r.fecFin")
+	Optional<Reserva> findReservaActiva(@Param("idUsuario") Long idUsuario,
+		                                    @Param("idReserva") Long idReserva);
 }

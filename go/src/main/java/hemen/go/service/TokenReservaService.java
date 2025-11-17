@@ -3,7 +3,11 @@ package hemen.go.service;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.security.Key;
+import java.util.Date;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.google.zxing.BarcodeFormat;
@@ -13,13 +17,18 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import hemen.go.entity.Reserva;
+import hemen.go.entity.Usuario;
+import hemen.go.repository.ReservaRepository;
+import hemen.go.repository.UsuarioRepository;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class TokenReservaService {
-
+	private final UsuarioRepository usuarioRepository;
+	private final MessageSource messageSource;
+	
 	
 	/**
      * Clave secreta utilizada para firmar y validar los tokens JWT.
@@ -27,7 +36,7 @@ public class TokenReservaService {
      */
     private final Key SECRET_KEY;
 
-    public TokenReservaService() {
+    public TokenReservaService(UsuarioRepository usuarioRepository,  MessageSource messageSource) {
         // Cargar dotenv en local, ignorar si no existe (producción)
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
@@ -39,6 +48,9 @@ public class TokenReservaService {
         }
 
         this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+        
+        this.usuarioRepository = usuarioRepository;
+        this.messageSource = messageSource;
     }
     
     public String generarToken(Reserva reserva) {
@@ -56,6 +68,26 @@ public class TokenReservaService {
                 .compact();
     }
     
+    
+    public String generarTokenPuerta(Long userId, Long idReserva,Long idParking) {
+        long ahora = System.currentTimeMillis();
+        long validez = 60 * 60 * 1000; // 30 minutos en milisegundos
+
+        Date issuedAt = new Date();
+        Date expiration = new Date(System.currentTimeMillis() + validez);
+        System.out.println("IssuedAt: " + issuedAt);
+        System.out.println("Expiration: " + expiration);
+        
+        return Jwts.builder()
+                .setSubject("abrir-puerta")
+                .claim("idUsuario", userId)
+                .claim("idReserva", idReserva)
+                .claim("idParking", idParking)
+                .setIssuedAt(issuedAt)
+                .setExpiration(expiration)
+                .signWith(SECRET_KEY)
+                .compact();
+    }
     
     public byte[] generarQRBytes(String token) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();

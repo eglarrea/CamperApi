@@ -81,8 +81,18 @@ public class ReservaService {
         reservaRepository.save(guardada);
     }
 	
-	public Reserva buscarReservaPorReservaToken(Long idUsuario, Long idReserva, String token) {
+	/*public Reserva buscarReservaPorReservaToken(Long idUsuario, Long idReserva, String token) {
 	    return reservaRepository.findByUsuarioAndReservaAndToken(idUsuario, idReserva, token)
+	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+	}*/
+	
+	
+	public Reserva buscarReservaPorReservaForToken(String email, Long idReserva) {
+		
+		Usuario user = usuarioRepository.findByEmailPersona(email)
+                .orElseThrow(() -> new UsernameNotFoundException( messageSource.getMessage(
+                        "error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+	    return reservaRepository.findReservaActiva(user.getId(), idReserva)
 	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 	}
 }
