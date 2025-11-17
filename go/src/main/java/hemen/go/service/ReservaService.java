@@ -1,5 +1,6 @@
 package hemen.go.service;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.context.MessageSource;
@@ -43,7 +44,7 @@ public class ReservaService {
         
         List<Reserva> solapadas = reservaRepository.findReservasSolapadas(
                 request.getIdPlaza(),
-                request.getIdParking(),
+               
                 request.getFecInicio(),
                 request.getFecFin()
         );
@@ -63,9 +64,12 @@ public class ReservaService {
         plaza.setParking(parking);
         reserva.setPersona(user);
         reserva.setPlaza(plaza);
+        reserva.setEstado("1");
         
         reserva.setFecInicio(request.getFecInicio());
         reserva.setFecFin(request.getFecFin());
+        reserva.setFecAlta( new Date(new java.util.Date().getTime()));
+       
         
         Reserva guardada = reservaRepository.save(reserva);
 
@@ -76,4 +80,9 @@ public class ReservaService {
         // 3. Actualizar la reserva con el token
         reservaRepository.save(guardada);
     }
+	
+	public Reserva buscarReservaPorReservaToken(Long idUsuario, Long idReserva, String token) {
+	    return reservaRepository.findByUsuarioAndReservaAndToken(idUsuario, idReserva, token)
+	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+	}
 }

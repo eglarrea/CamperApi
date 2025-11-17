@@ -1,7 +1,10 @@
 package hemen.go.controller.secure;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,11 +118,11 @@ public class ReservaController {
     	            .toList();
     	        return ResponseEntity.badRequest().body(errores);
     	    }
-    		
+    		byte[] qrBytes = null;
     		try {
     			
     			//TODO BUSCAR RESERVA POR TOKEN E ID RESERVA
-				tokenReservaService.generarQRBytes(request.getTokenReserva());
+    			 qrBytes =	tokenReservaService.generarQRBytes(request.getTokenReserva());
 			} catch (WriterException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -127,8 +130,13 @@ public class ReservaController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+    		String qrBase64 = Base64.getEncoder().encodeToString(qrBytes);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("qrBase64", qrBase64);
+
+            return ResponseEntity.ok(response);
     		
-    		return ResponseEntity.ok(messageSource.getMessage("mensage.ok.reserva.creada", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
     		  String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
