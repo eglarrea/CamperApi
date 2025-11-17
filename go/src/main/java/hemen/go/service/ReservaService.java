@@ -1,17 +1,18 @@
 package hemen.go.service;
 
+import java.sql.Date;
+import java.util.List;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import hemen.go.dto.request.ReservaRequest;
-import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.entity.Parking;
 import hemen.go.entity.Plaza;
 import hemen.go.entity.Reserva;
 import hemen.go.entity.Usuario;
-import hemen.go.repository.ParkingRepository;
 import hemen.go.repository.ReservaRepository;
 import hemen.go.repository.UsuarioRepository;
 
@@ -40,6 +41,20 @@ public class ReservaService {
                     "user.iban.invalid", null, LocaleContextHolder.getLocale());
            throw new IllegalArgumentException(mensaje);
         }
+        
+        List<Reserva> solapadas = reservaRepository.findReservasSolapadas(
+                request.getIdPlaza(),
+               
+                request.getFecInicio(),
+                request.getFecFin()
+        );
+
+        if (!solapadas.isEmpty()) {
+            String mensaje = messageSource.getMessage(
+                    "error.reserva.solapada", null, LocaleContextHolder.getLocale());
+            throw new IllegalArgumentException(mensaje);
+        }
+        
         Reserva reserva = new Reserva();
         Plaza plaza = new Plaza();
         Parking parking= new Parking();
@@ -49,9 +64,12 @@ public class ReservaService {
         plaza.setParking(parking);
         reserva.setPersona(user);
         reserva.setPlaza(plaza);
+        reserva.setEstado("1");
         
         reserva.setFecInicio(request.getFecInicio());
         reserva.setFecFin(request.getFecFin());
+        reserva.setFecAlta( new Date(new java.util.Date().getTime()));
+       
         
         Reserva guardada = reservaRepository.save(reserva);
 
@@ -62,4 +80,19 @@ public class ReservaService {
         // 3. Actualizar la reserva con el token
         reservaRepository.save(guardada);
     }
+	
+	/*public Reserva buscarReservaPorReservaToken(Long idUsuario, Long idReserva, String token) {
+	    return reservaRepository.findByUsuarioAndReservaAndToken(idUsuario, idReserva, token)
+	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+	}*/
+	
+	
+	public Reserva buscarReservaPorReservaForToken(String email, Long idReserva) {
+		
+		Usuario user = usuarioRepository.findByEmailPersona(email)
+                .orElseThrow(() -> new UsernameNotFoundException( messageSource.getMessage(
+                        "error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+	    return reservaRepository.findReservaActiva(user.getId(), idReserva)
+	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+	}
 }
