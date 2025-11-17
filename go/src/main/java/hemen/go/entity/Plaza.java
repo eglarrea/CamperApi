@@ -44,6 +44,9 @@ public class Plaza {
     @Column(name = "estado_plaza", length = 1, nullable = false)
     private String estado;
     
+    @Column(name = "precio_plaza")
+    private float precio;
+    
     @OneToMany (mappedBy = "plaza")
     private List<Reserva> reservas;
 
@@ -105,5 +108,13 @@ public class Plaza {
 
 	public void setReservas(List<Reserva> reservas) {
 		this.reservas = reservas;
+	}
+
+	public float getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(float precio) {
+		this.precio = precio;
 	}
 }
