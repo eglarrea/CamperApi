@@ -58,7 +58,7 @@ public class Parking {
     private boolean tieneResiduales;
     
     @Column(name = "tiene_plazas_vip_parking")
-    private boolean tienePlazasVip;
+    private boolean tieneVips;
 
     @OneToMany (mappedBy = "parking")
     private List<Plaza> plazas;
@@ -151,12 +151,12 @@ public class Parking {
 		this.tieneResiduales = tieneResiduales;
 	}
 
-	public boolean isTienePlazasVip() {
-		return tienePlazasVip;
+	public boolean isTieneVips() {
+		return tieneVips;
 	}
 
-	public void setTienePlazasVip(boolean tienePlazasVip) {
-		this.tienePlazasVip = tienePlazasVip;
+	public void setTieneVips(boolean tienePlazasVip) {
+		this.tieneVips = tienePlazasVip;
 	}
 
 	public String getWeb() {
