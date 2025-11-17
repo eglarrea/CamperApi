@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import hemen.go.entity.Parking;
 
@@ -30,4 +32,10 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 	List<Parking> findAllByPlazasReservasFecInicioBetween(Date fechaDesde, Date fechaHasta);
 	List<Parking> findAllByPlazasReservasFecFinBetween(Date fechaDesde, Date fechaHasta);
 	List<Parking> findAllByPlazasReservasFecInicioBetweenOrPlazasReservasFecFinBetween(Date fechaInicioDesde, Date fechaInicioHasta, Date fechaFinDesde, Date fechaFinHasta);
+	
+	@Query("SELECT pk FROM Parking pk INNER JOIN Plaza pl ON pk.id = pl.parking.id " + 
+			"LEFT JOIN Reserva r ON pl.id = r.plaza.id " +
+			" WHERE r.fecInicio IS NULL OR (r.estado = '1' AND r.fecInicio NOT BETWEEN :fechaDesde AND :fechaHasta " +
+			" AND r.fecFin NOT BETWEEN :fechaDesde AND :fechaHasta)") 
+	List<Parking> findAllByPlazasLibres(@Param("fechaDesde") Date fechaDesde, @Param("fechaHasta") Date fechaHasta);
 }
