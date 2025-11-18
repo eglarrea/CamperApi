@@ -18,18 +18,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.zxing.WriterException;
 
+import hemen.go.dto.request.CancelarReservaRequest;
 import hemen.go.dto.request.QrRequest;
 import hemen.go.dto.request.ReservaRequest;
 import hemen.go.entity.Reserva;
 import hemen.go.service.ReservaService;
 import hemen.go.service.TokenReservaService;
-import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -41,8 +42,6 @@ public class ReservaController {
 	
 	 // Logger para registrar eventos y errores
     private static final Logger logger = LoggerFactory.getLogger(ReservaController.class);
-    //private final UsuarioRepository usuarioRepository;
-    private final UserService userService;
     
     private final ReservaService reservaService;
     
@@ -51,8 +50,7 @@ public class ReservaController {
     // Fuente de mensajes para internacionalización (i18n)
     private final MessageSource messageSource;
 
-    public ReservaController(UserService userService, MessageSource messageSource, ReservaService reservaService, TokenReservaService tokenReservaService) {
-        this.userService = userService;
+    public ReservaController( MessageSource messageSource, ReservaService reservaService, TokenReservaService tokenReservaService) {
         this.messageSource = messageSource;
         this.reservaService = reservaService;
         this.tokenReservaService = tokenReservaService;
@@ -79,16 +77,15 @@ public class ReservaController {
     	            .toList();
     	        return ResponseEntity.badRequest().body(errores);
     	    }
-    		
     		reservaService.reservar(userDetails.getUsername(), request);
-    		
     		return ResponseEntity.ok(messageSource.getMessage("message.ok.reserva.creada", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
-    		  String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
+    		String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
     	} catch (IllegalArgumentException e) {
-                logger.error("Datos no validos: {}", e.getMessage());  
-                return ResponseEntity.badRequest().body(e.getMessage());
+    		String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
+            logger.error("Datos no validos: {}", e.getMessage());  
+            return ResponseEntity.badRequest().body(mensaje);
     	} catch (jakarta.validation.ConstraintViolationException e) {
     		List<String> errores = e.getConstraintViolations().stream()
     		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
@@ -97,6 +94,46 @@ public class ReservaController {
         }
     }
     
+    
+    @PutMapping("/cancelar")
+    @Operation(
+        summary = "Cancelar una reserva",
+        description = "Cancela la reserva realizada"
+                    + "Si los datos son válidos "
+    )
+    @PreAuthorize("hasAnyRole('USER')")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Cancela la reserva correctamente"),
+        @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
+        @ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
+    })
+    public ResponseEntity<?> candelarReservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody CancelarReservaRequest request, BindingResult result) {
+    	try {
+    		if (result.hasErrors()) {
+    	        List<String> errores = result.getAllErrors().stream()
+    	            .map(ObjectError::getDefaultMessage)
+    	            .toList();
+    	        return ResponseEntity.badRequest().body(errores);
+    	    }
+    		
+    		reservaService.cancelarReserve(userDetails.getUsername(), request.getIdReserva());
+    		
+    		return ResponseEntity.ok(messageSource.getMessage("message.ok.reserva.cancelada", null, LocaleContextHolder.getLocale()));
+    	} catch (DataIntegrityViolationException ex) {
+    		String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
+    	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
+    	} catch (IllegalArgumentException e) {
+                logger.error("Datos no validos: {}", e.getMessage());  
+                String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
+                return ResponseEntity.badRequest().body(mensaje);
+    	} catch (jakarta.validation.ConstraintViolationException e) {
+    		List<String> errores = e.getConstraintViolations().stream()
+    		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
+    		            " (valor: " + v.getInvalidValue() + ")").toList();
+    		return ResponseEntity.badRequest().body(errores);
+        }
+    }
     
     @PostMapping("/qr")
     @Operation(

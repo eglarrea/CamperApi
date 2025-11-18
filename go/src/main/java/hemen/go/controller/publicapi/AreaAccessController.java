@@ -84,10 +84,10 @@ public class AreaAccessController {
 
             Long idParking = claims.getBody().get("idParking", Long.class);
             if (idParking == request.getIdParking()) {
-                return ResponseEntity.ok("Puerta abierta correctamente");
+                return ResponseEntity.ok(messageSource.getMessage("message.ok.acceso", null, LocaleContextHolder.getLocale()));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(messageSource.getMessage("message.ok.acceso", null, LocaleContextHolder.getLocale()));
+                        .body(messageSource.getMessage("message.error.acceso.token", null, LocaleContextHolder.getLocale()));
             }
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

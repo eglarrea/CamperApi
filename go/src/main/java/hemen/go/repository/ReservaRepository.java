@@ -26,4 +26,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 		       "AND CURRENT_DATE BETWEEN r.fecInicio AND r.fecFin")
 	Optional<Reserva> findReservaActiva(@Param("idUsuario") Long idUsuario,
 		                                    @Param("idReserva") Long idReserva);
+	
+	Optional<Reserva> findByIdAndPersonaId(Long idReserva, Long idUsuario);
 }
