@@ -91,7 +91,7 @@ public class ReservaService {
 		Usuario user = usuarioRepository.findByEmailPersona(email)
                 .orElseThrow(() -> new UsernameNotFoundException( messageSource.getMessage(
                         "error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
-		Reserva reserva = reservaRepository.findByIdAndPersonaId( idReserva,user.getId())
+		Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado( idReserva,user.getId(),"1")
         .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 		reserva.setEstado("0");
 		reservaRepository.save(reserva);
