@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -94,6 +97,30 @@ public class ReservaController {
         }
     }
     
+    @GetMapping("/{id}")
+    @Operation(
+        summary = "Obtener detalle de una reserva",
+        description = "Devuelve el detalle completo de una reserva por su identificador"
+    )
+    @PreAuthorize("hasAnyRole('USER')")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Detalle de la reserva devuelto correctamente"),
+        @ApiResponse(responseCode = "404", description = "La reserva no existe o no pertenece al usuario"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<?> getReservaDetalle(
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
+            @PathVariable Long id) {
+        try {
+        	//TODO VER QUE DATOS NECESITAMOS PARA HACER EL REPONSE 
+            Reserva reserva = reservaService.getReservaByIdAndUsuarioEmail(id, userDetails.getUsername());
+           // ReservaDtoResponse response = new ReservaDtoResponse(reserva);
+            return ResponseEntity.ok("ok");
+        } catch (NoSuchElementException e) {
+            String mensaje = messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensaje);
+        }
+    }
     
     @PutMapping("/cancelar")
     @Operation(

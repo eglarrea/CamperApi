@@ -2,6 +2,7 @@ package hemen.go.service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.context.MessageSource;
@@ -104,5 +105,13 @@ public class ReservaService {
                         "error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 	    return reservaRepository.findReservaActiva(user.getId(), idReserva)
 	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+	}
+	
+	public Reserva getReservaByIdAndUsuarioEmail(Long idReserva, String emailUsuario) {
+	    Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
+	            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+	    return reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
+	            .orElseThrow(() -> new NoSuchElementException("Reserva no encontrada"));
 	}
 }
