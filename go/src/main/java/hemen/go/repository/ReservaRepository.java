@@ -27,5 +27,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 	Optional<Reserva> findReservaActiva(@Param("idUsuario") Long idUsuario,
 		                                    @Param("idReserva") Long idReserva);
 	
-	Optional<Reserva> findByIdAndPersonaId(Long idReserva, Long idUsuario);
+	Optional<Reserva> findByIdAndPersonaIdAndEstado(Long idReserva, Long idUsuario, String estado);
+	
 }
