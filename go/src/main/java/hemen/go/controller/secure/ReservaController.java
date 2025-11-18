@@ -82,7 +82,7 @@ public class ReservaController {
     		
     		reservaService.reservar(userDetails.getUsername(), request);
     		
-    		return ResponseEntity.ok(messageSource.getMessage("message.ok.reserva.creada", null, LocaleContextHolder.getLocale()));
+    		return ResponseEntity.ok(messageSource.getMessage("mensage.ok.reserva.creada", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
     		  String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
