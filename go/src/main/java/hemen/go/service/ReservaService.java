@@ -71,14 +71,14 @@ public class ReservaService {
         reserva.setFecAlta( new Date(new java.util.Date().getTime()));
        
         
-        Reserva guardada = reservaRepository.save(reserva);
+        reservaRepository.save(reserva);
 
         // 2. Generar el token usando la reserva ya guardada (con id)
-        String token = tokenReservaService.generarToken(guardada);
+        /*String token = tokenReservaService.generarToken(guardada);
         guardada.setToken(token);
 
         // 3. Actualizar la reserva con el token
-        reservaRepository.save(guardada);
+        reservaRepository.save(guardada);*/
     }
 	
 	/*public Reserva buscarReservaPorReservaToken(Long idUsuario, Long idReserva, String token) {

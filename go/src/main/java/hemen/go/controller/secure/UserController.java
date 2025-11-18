@@ -118,7 +118,7 @@ public class UserController {
     	    }
     		
     		userService.updateUserData(userDetails.getUsername(), updatedData);
-    		return ResponseEntity.ok(messageSource.getMessage("mensage.ok.usuario.actualizado", null, LocaleContextHolder.getLocale()));
+    		return ResponseEntity.ok(messageSource.getMessage("message.ok.usuario.actualizado", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
     		  String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
