@@ -1,13 +1,10 @@
 package hemen.go.service;
 
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.google.zxing.BarcodeFormat;
@@ -16,31 +13,41 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import hemen.go.entity.Reserva;
-import hemen.go.entity.Usuario;
-import hemen.go.repository.ReservaRepository;
-import hemen.go.repository.UsuarioRepository;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+/**
+ * Servicio encargado de la generación de tokens JWT asociados a reservas y accesos,
+ * así como la creación de códigos QR que contienen dichos tokens.
+ * 
+ * <p>Este servicio se utiliza para:
+ * <ul>
+ *   <li>Generar un token JWT temporal para apertura de puertas.</li>
+ *   <li>Generar un código QR en formato PNG a partir de un token.</li>
+ * </ul>
+ * 
+ * <p>El secreto JWT se obtiene de variables de entorno (.env o System.getenv),
+ * y debe tener al menos 32 caracteres para garantizar seguridad.</p>
+ * 
+ * @author 
+ */
 @Service
 public class TokenReservaService {
-	private final UsuarioRepository usuarioRepository;
-	private final MessageSource messageSource;
-	
-	
-	/**
-     * Clave secreta utilizada para firmar y validar los tokens JWT.
-     * Debe tener al menos 256 bits (32 caracteres si se usa ASCII).
-     */
+    
+    /** Clave secreta utilizada para firmar los JWT. */
     private final Key SECRET_KEY;
 
-    public TokenReservaService(UsuarioRepository usuarioRepository,  MessageSource messageSource) {
-        // Cargar dotenv en local, ignorar si no existe (producción)
+    /**
+     * Constructor del servicio. Inicializa la clave secreta JWT a partir de
+     * variables de entorno y valida su longitud mínima.
+     *
+     * @param usuarioRepository repositorio de usuarios
+     * @param messageSource fuente de mensajes para i18n
+     * @throws IllegalStateException si la clave JWT no está definida o es demasiado corta
+     */
+    public TokenReservaService() {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
-
-        // Primero intenta leer de .env, si no existe usa System.getenv
         String secret = dotenv.get("JWT_SECRET", System.getenv("JWT_SECRET"));
 
         if (secret == null || secret.length() < 32) {
@@ -48,12 +55,24 @@ public class TokenReservaService {
         }
 
         this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
-        
-        this.usuarioRepository = usuarioRepository;
-        this.messageSource = messageSource;
     }
     
-    public String generarToken(Reserva reserva) {
+    /**
+     * Genera un token JWT asociado a una reserva.
+     * 
+     * <p>El token incluye información como:
+     * <ul>
+     *   <li>ID de la persona</li>
+     *   <li>ID del parking</li>
+     *   <li>ID de la plaza</li>
+     *   <liFechas de inicio, fin y alta de la reserva</li>
+     * </ul>
+     * </p>
+     *
+     * @param reserva objeto {@link Reserva} con los datos de la reserva
+     * @return token JWT firmado
+     */
+    /*public String generarToken(Reserva reserva) {
         return Jwts.builder()
                 .setSubject("reserva-" + reserva.getId())
                 .claim("idPersona", reserva.getPersona().getId())
@@ -66,17 +85,28 @@ public class TokenReservaService {
                 .setExpiration(reserva.getFecFin())
                 .signWith(SECRET_KEY)
                 .compact();
-    }
+    }*/
     
-    
-    public String generarTokenPuerta(Long userId, Long idReserva,Long idParking) {
-        long ahora = System.currentTimeMillis();
-        long validez = 60 * 60 * 1000; // 30 minutos en milisegundos
-
+    /**
+     * Genera un token JWT temporal para apertura de puertas.
+     * 
+     * <p>El token tiene una validez de 1 hora e incluye:
+     * <ul>
+     *   <li>ID del usuario</li>
+     *   <li>ID de la reserva</li>
+     *   <li>ID del parking</li>
+     * </ul>
+     * </p>
+     *
+     * @param userId identificador del usuario
+     * @param idReserva identificador de la reserva
+     * @param idParking identificador del parking
+     * @return token JWT firmado válido por 1 hora
+     */
+    public String generarTokenPuerta(Long userId, Long idReserva, Long idParking) {
+        long validez = 60 * 60 * 1000; // 1 hora en milisegundos
         Date issuedAt = new Date();
         Date expiration = new Date(System.currentTimeMillis() + validez);
-        System.out.println("IssuedAt: " + issuedAt);
-        System.out.println("Expiration: " + expiration);
         
         return Jwts.builder()
                 .setSubject("abrir-puerta")
@@ -89,6 +119,16 @@ public class TokenReservaService {
                 .compact();
     }
     
+    /**
+     * Genera un código QR en formato PNG a partir de un token JWT.
+     * 
+     * <p>El QR se genera con tamaño 300x300 píxeles.</p>
+     *
+     * @param token cadena JWT a codificar en el QR
+     * @return arreglo de bytes que representa la imagen PNG del QR
+     * @throws WriterException si ocurre un error al generar el QR
+     * @throws IOException si ocurre un error al escribir la imagen
+     */
     public byte[] generarQRBytes(String token) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = qrCodeWriter.encode(token, BarcodeFormat.QR_CODE, 300, 300);
