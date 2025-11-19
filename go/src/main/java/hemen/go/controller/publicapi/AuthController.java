@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
 
 import hemen.go.dto.request.LoginRequest;
 import hemen.go.dto.request.RegisterRequest;
@@ -50,6 +51,7 @@ public class AuthController {
     // Servicios necesarios para autenticación y gestión de usuarios
     private final AuthService authService;
     private final UserService userService;
+    private LocaleResolver localeResolver;
 
     // Fuente de mensajes para internacionalización (i18n)
     private final MessageSource messageSource;
@@ -61,10 +63,11 @@ public class AuthController {
      * @param userService servicio de gestión de usuarios (consultas, datos).
      * @param messageSource fuente de mensajes para internacionalización.
      */
-    public AuthController(AuthService authService, UserService userService, MessageSource messageSource) {
+    public AuthController(AuthService authService, UserService userService, MessageSource messageSource,LocaleResolver localeResolver) {
         this.authService = authService;
         this.userService = userService;
         this.messageSource = messageSource;
+        this.localeResolver=localeResolver;
     }
 
     /**
@@ -114,6 +117,7 @@ public class AuthController {
             String mensaje = messageSource.getMessage("auth.invalid.credentials", null, LocaleContextHolder.getLocale());
             logger.error("Locale:" + LocaleContextHolder.getLocale());
             logger.error("mensaje:" +mensaje);
+            logger.error("LocaleResolver en uso: " + localeResolver.getClass().getName());
             // Respuesta con estado 401 Unauthorized
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
         }
