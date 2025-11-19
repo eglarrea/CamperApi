@@ -24,6 +24,8 @@ import hemen.go.dto.request.RegisterRequest;
 import hemen.go.entity.Usuario;
 import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -57,7 +59,15 @@ public class UserController {
     @Operation(
         summary = "Obtener usuario por ID",
         description = "Este endpoint permite a un administrador obtener los datos de un usuario específico mediante su ID.",
-   		security = { @SecurityRequirement (name = "bearerAuth") }
+   		security = { @SecurityRequirement (name = "bearerAuth") },
+		parameters = {                    		  
+            @Parameter(
+          		   name = "Accept-Language",
+                     description = "Idioma de la respuesta (es, en, eu)",
+                     in = ParameterIn.HEADER,
+                     required = false
+          		  )
+          }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Usuario encontrado correctamente"),
@@ -78,7 +88,15 @@ public class UserController {
         summary = "Obtener datos del usuario autenticado",
         description = "Devuelve la información del usuario actualmente autenticado en el sistema. " +
                       "Disponible para roles USER y ADMIN.",
-        security = { @SecurityRequirement (name = "bearerAuth") }
+        security = { @SecurityRequirement (name = "bearerAuth") },
+		parameters = {                    		  
+            @Parameter(
+          		   name = "Accept-Language",
+                     description = "Idioma de la respuesta (es, en, eu)",
+                     in = ParameterIn.HEADER,
+                     required = false
+          		  )
+          }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Datos del usuario obtenidos correctamente"),
@@ -99,7 +117,15 @@ public class UserController {
     @Operation(
         summary = "Actualizar datos del usuario autenticado",
         description = "Permite a un usuario autenticado (roles USER o ADMIN) actualizar sus datos personales. "
-                    + "El cuerpo de la petición debe contener los campos a modificar."
+                    + "El cuerpo de la petición debe contener los campos a modificar.",
+        parameters = {                    		  
+	        @Parameter(
+	      		   name = "Accept-Language",
+	                 description = "Idioma de la respuesta (es, en, eu)",
+	                 in = ParameterIn.HEADER,
+	                 required = false
+	      		  )
+	      }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Datos del usuario actualizados correctamente"),

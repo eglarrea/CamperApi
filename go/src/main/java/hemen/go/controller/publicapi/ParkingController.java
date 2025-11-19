@@ -19,6 +19,8 @@ import hemen.go.dto.request.FilterParkingRequest;
 import hemen.go.dto.response.FilterParkingResponse;
 import hemen.go.service.ParkingService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,7 +49,15 @@ public class ParkingController {
     @GetMapping("/parkings")
     @Operation(
         summary = "Obtener todos los parkings",
-        description = "Método para obtener todos los parkings dados de alta."
+        description = "Método para obtener todos los parkings dados de alta.",
+		parameters = {                    		  
+	          @Parameter(
+	        		   name = "Accept-Language",
+	                   description = "Idioma de la respuesta (es, en, eu)",
+	                   in = ParameterIn.HEADER,
+	                   required = false
+	        		  )
+        }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),

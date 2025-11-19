@@ -16,6 +16,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,7 +87,15 @@ public class AreaAccessController {
     @PostMapping("/acceder")
     @Operation(
             summary = "Acceso a parking ",
-            description = "Cuando le lea el código Qr se llama a este enpoint para abrir la pureba "
+            description = "Cuando le lea el código Qr se llama a este enpoint para abrir la pureba ",
+    		parameters = {                    		  
+              @Parameter(
+            		   name = "Accept-Language",
+                       description = "Idioma de la respuesta (es, en, eu)",
+                       in = ParameterIn.HEADER,
+                       required = false
+            		  )
+	        }
                         
         )
         @ApiResponses(value = {
