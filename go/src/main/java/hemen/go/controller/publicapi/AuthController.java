@@ -112,7 +112,8 @@ public class AuthController {
 
             // Mensaje internacionalizado según el idioma del cliente
             String mensaje = messageSource.getMessage("auth.invalid.credentials", null, LocaleContextHolder.getLocale());
-
+            logger.error("Locale:" + LocaleContextHolder.getLocale());
+            logger.error("mensaje:" +mensaje);
             // Respuesta con estado 401 Unauthorized
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
         }
