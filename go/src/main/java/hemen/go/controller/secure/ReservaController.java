@@ -69,7 +69,6 @@ public class ReservaController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Reserva realizada correctamente"),
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
-        @ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
     })
     public ResponseEntity<?> reservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody ReservaRequest request, BindingResult result) {
@@ -132,7 +131,6 @@ public class ReservaController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Cancela la reserva correctamente"),
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
-        @ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
     })
     public ResponseEntity<?> candelarReservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody CancelarReservaRequest request, BindingResult result) {
@@ -172,7 +170,6 @@ public class ReservaController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Reserva realizada correctamente"),
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
-        @ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
     })
     public ResponseEntity<?> qr(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody QrRequest request, BindingResult result) {
