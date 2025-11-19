@@ -35,6 +35,8 @@ import hemen.go.entity.Reserva;
 import hemen.go.service.ReservaService;
 import hemen.go.service.TokenReservaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,7 +67,15 @@ public class ReservaController {
     @Operation(
         summary = "Realizar una reserva en un parking",
         description = "Realiza una reserva en un parking "
-                    + "Si los datos son válidos "
+                    + "Si los datos son válidos ",
+        parameters = {                    		  
+            @Parameter(
+          		   name = "Accept-Language",
+                     description = "Idioma de la respuesta (es, en, eu)",
+                     in = ParameterIn.HEADER,
+                     required = false
+          		  )
+          }
     )
     @PreAuthorize("hasAnyRole('USER')")
     @ApiResponses(value = {
@@ -101,7 +111,15 @@ public class ReservaController {
     @GetMapping("/{id}")
     @Operation(
         summary = "Obtener detalle de una reserva",
-        description = "Devuelve el detalle completo de una reserva por su identificador"
+        description = "Devuelve el detalle completo de una reserva por su identificador",
+		parameters = {                    		  
+	            @Parameter(
+	          		   name = "Accept-Language",
+	                     description = "Idioma de la respuesta (es, en, eu)",
+	                     in = ParameterIn.HEADER,
+	                     required = false
+	          		  )
+	          }
     )
     @PreAuthorize("hasAnyRole('USER')")
     @ApiResponses(value = {
@@ -127,7 +145,15 @@ public class ReservaController {
     @Operation(
         summary = "Cancelar una reserva",
         description = "Cancela la reserva realizada"
-                    + "Si los datos son válidos "
+                    + "Si los datos son válidos ",
+        parameters = {                    		  
+            @Parameter(
+          		   name = "Accept-Language",
+                     description = "Idioma de la respuesta (es, en, eu)",
+                     in = ParameterIn.HEADER,
+                     required = false
+          		  )
+          }
     )
     @PreAuthorize("hasAnyRole('USER')")
     @ApiResponses(value = {
@@ -166,7 +192,15 @@ public class ReservaController {
     @Operation(
         summary = "Obtener el codigo qr de la reserva",
         description = "Realiza una reserva en un parking"
-                    + "Si los datos son válidos "
+                    + "Si los datos son válidos ",
+        parameters = {                    		  
+            @Parameter(
+          		   name = "Accept-Language",
+                     description = "Idioma de la respuesta (es, en, eu)",
+                     in = ParameterIn.HEADER,
+                     required = false
+          		  )
+          }
     )
     @PreAuthorize("hasAnyRole('USER')")
     @ApiResponses(value = {

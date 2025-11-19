@@ -54,7 +54,6 @@ public class AuthController {
     // Servicios necesarios para autenticación y gestión de usuarios
     private final AuthService authService;
     private final UserService userService;
-    private LocaleResolver localeResolver;
 
     // Fuente de mensajes para internacionalización (i18n)
     private final MessageSource messageSource;
@@ -66,11 +65,10 @@ public class AuthController {
      * @param userService servicio de gestión de usuarios (consultas, datos).
      * @param messageSource fuente de mensajes para internacionalización.
      */
-    public AuthController(AuthService authService, UserService userService, MessageSource messageSource,LocaleResolver localeResolver) {
+    public AuthController(AuthService authService, UserService userService, MessageSource messageSource) {
         this.authService = authService;
         this.userService = userService;
         this.messageSource = messageSource;
-        this.localeResolver=localeResolver;
     }
 
     /**
@@ -95,18 +93,14 @@ public class AuthController {
         summary = "Loguearse en la API",
         description = "Permite a un usuario autenticarse con su email y contraseña. " +
                       "Si las credenciales son válidas, devuelve un token JWT junto con los datos del usuario.",
-                      parameters = {
-                    		  
-                              @Parameter(
-                            		   name = "Accept-Language",
-                                       description = "Idioma de la respuesta (es, en, eu)",
-                                       in = ParameterIn.HEADER,
-                                       required = false
-                            		  )
-                              
-                               
-                              
-                          }
+        parameters = {                    		  
+              @Parameter(
+            		   name = "Accept-Language",
+                       description = "Idioma de la respuesta (es, en, eu)",
+                       in = ParameterIn.HEADER,
+                       required = false
+            		  )
+        }
     )
     @ApiResponses(value = {
         @ApiResponse (responseCode = "200", description = "Autenticación exitosa. Devuelve token y datos del usuario"),
@@ -115,7 +109,7 @@ public class AuthController {
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante la autenticación")
     })
     
-    public ResponseEntity<?> login(@RequestBody LoginRequest request,HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             // Autenticación y generación de token
             String token = authService.authenticate(request.getEmail(), request.getPassword());
@@ -128,14 +122,8 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             // Log de error con credenciales inválidas
             logger.error("Credenciales no válidas para email: {} y password: {}", request.getEmail(), request.getPassword());
-
             // Mensaje internacionalizado según el idioma del cliente
             String mensaje = messageSource.getMessage("auth.invalid.credentials", null, LocaleContextHolder.getLocale());
-            logger.error("Locale:" + LocaleContextHolder.getLocale());
-            logger.error("mensaje:" +mensaje);
-            logger.error("LocaleResolver en uso: " + localeResolver.getClass().getName());
-            String header = httpRequest.getHeader("Accept-Language");
-            logger.error("Cabecera Accept-Language: " + header);
             // Respuesta con estado 401 Unauthorized
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
         }
@@ -147,7 +135,15 @@ public class AuthController {
     @Operation(
         summary = "Registrarse en la aplicación",
         description = "Permite a un nuevo usuario registrarse en la aplicación enviando sus datos personales. "
-                    + "Si los datos son válidos y no existe un usuario con el mismo email, se crea el registro."
+                    + "Si los datos son válidos y no existe un usuario con el mismo email, se crea el registro.",
+        parameters = {                    		  
+            @Parameter(
+          		   name = "Accept-Language",
+                     description = "Idioma de la respuesta (es, en, eu)",
+                     in = ParameterIn.HEADER,
+                     required = false
+          		  )
+          }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),

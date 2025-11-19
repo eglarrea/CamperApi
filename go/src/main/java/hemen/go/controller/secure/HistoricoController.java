@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import hemen.go.dto.response.ReservaResponse;
 import hemen.go.service.ReservaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,7 +38,15 @@ public class HistoricoController {
     @GetMapping("/listado")
     @Operation(
         summary = "Obtener listado de historico de reservas",
-        description = "Devuelve el listado de historico de reservas"
+        description = "Devuelve el listado de historico de reservas",
+		parameters = {                    		  
+	              @Parameter(
+	            		   name = "Accept-Language",
+	                       description = "Idioma de la respuesta (es, en, eu)",
+	                       in = ParameterIn.HEADER,
+	                       required = false
+	            		  )
+	        }
     )
     @PreAuthorize("hasAnyRole('USER')")
     @ApiResponses(value = {
