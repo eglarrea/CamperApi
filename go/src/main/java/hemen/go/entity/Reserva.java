@@ -46,8 +46,6 @@ public class Reserva {
 	@Column(name = "estado_reserva", length = 1, nullable = false)
 	private String estado;
 	
-	@Column(name = "token_reserva", length = 100, nullable = false)
-	private String token;
 
 	public Long getId() {
 		return id;
@@ -87,15 +85,7 @@ public class Reserva {
 
 	public void setEstado(String estado) {
 		this.estado = estado;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
+	}	
 
 	public void setPersona(Usuario persona) {
 		this.persona = persona;
