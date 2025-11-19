@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 /**
@@ -99,7 +100,7 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "Credenciales incorrectas. No autorizado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante la autenticación")
     })
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request,HttpServletRequest httpRequest) {
         try {
             // Autenticación y generación de token
             String token = authService.authenticate(request.getEmail(), request.getPassword());
@@ -118,6 +119,8 @@ public class AuthController {
             logger.error("Locale:" + LocaleContextHolder.getLocale());
             logger.error("mensaje:" +mensaje);
             logger.error("LocaleResolver en uso: " + localeResolver.getClass().getName());
+            String header = httpRequest.getHeader("Accept-Language");
+            logger.error("Cabecera Accept-Language: " + header);
             // Respuesta con estado 401 Unauthorized
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
         }
