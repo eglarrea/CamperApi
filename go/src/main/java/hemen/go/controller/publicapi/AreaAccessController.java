@@ -18,6 +18,7 @@ import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Controlador REST público encargado de gestionar el acceso a áreas mediante tokens JWT.
@@ -44,6 +45,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
  */
 @RestController
 @RequestMapping("/api/public")
+@Tag(name="Acceso a parking")
 public class AreaAccessController {
 
     /** Utilidad para validar y procesar tokens JWT. */
