@@ -2,6 +2,7 @@ package hemen.go.service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.context.MessageSource;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import hemen.go.dto.request.ReservaRequest;
+import hemen.go.dto.response.ReservaResponse;
 import hemen.go.entity.Parking;
 import hemen.go.entity.Plaza;
 import hemen.go.entity.Reserva;
@@ -105,4 +107,23 @@ public class ReservaService {
 	    return reservaRepository.findReservaActiva(user.getId(), idReserva)
 	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 	}
+	
+	public Reserva getReservaByIdAndUsuarioEmail(Long idReserva, String emailUsuario) {
+	    Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
+	            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+	    return reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
+	            .orElseThrow(() -> new NoSuchElementException("Reserva no encontrada"));
+	}
+	
+	public List<ReservaResponse> getHistoricoReservas(String emailUsuario) {
+        Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        List<Reserva> reservas = reservaRepository.findByPersonaIdOrderByFecAltaDesc(usuario.getId());
+
+        return reservas.stream()
+                .map(ReservaResponse::new) // convierte cada Reserva en ReservaResponse
+                .toList();
+    }
 }

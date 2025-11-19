@@ -21,9 +21,11 @@ import hemen.go.service.ParkingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/public/parking")
+@Tag(name="Parking")
 public class ParkingController {
 	private static final Logger logger = LoggerFactory.getLogger(ParkingController.class);
 

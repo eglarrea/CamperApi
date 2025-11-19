@@ -15,6 +15,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Controlador REST público encargado de gestionar el acceso a áreas mediante tokens JWT.
@@ -41,6 +45,7 @@ import io.jsonwebtoken.JwtException;
  */
 @RestController
 @RequestMapping("/api/public")
+@Tag(name="Acceso a parking")
 public class AreaAccessController {
 
     /** Utilidad para validar y procesar tokens JWT. */
@@ -78,6 +83,15 @@ public class AreaAccessController {
      * @return respuesta HTTP con el resultado de la validación
      */
     @PostMapping("/acceder")
+    @Operation(
+            summary = "Acceso a parking ",
+            description = "Cuando le lea el código Qr se llama a este enpoint para abrir la pureba "
+                        
+        )
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Acceso permitido"),
+            @ApiResponse(responseCode = "401", description = "Acceso no autorizado"),
+        })
     public ResponseEntity<?> abrirPuerta(@RequestBody TokenRequest request) {
         try {
             Jws<Claims> claims = jwtUtil.validarTokenPuerta(request.getToken());
