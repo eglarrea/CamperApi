@@ -25,6 +25,8 @@ import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.service.AuthService;
 import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -92,7 +94,19 @@ public class AuthController {
     @Operation(
         summary = "Loguearse en la API",
         description = "Permite a un usuario autenticarse con su email y contraseña. " +
-                      "Si las credenciales son válidas, devuelve un token JWT junto con los datos del usuario."
+                      "Si las credenciales son válidas, devuelve un token JWT junto con los datos del usuario.",
+                      parameters = {
+                    		  
+                              @Parameter(
+                            		   name = "Accept-Language",
+                                       description = "Idioma de la respuesta (es, en, eu)",
+                                       in = ParameterIn.HEADER,
+                                       required = false
+                            		  )
+                              
+                               
+                              
+                          }
     )
     @ApiResponses(value = {
         @ApiResponse (responseCode = "200", description = "Autenticación exitosa. Devuelve token y datos del usuario"),
@@ -100,6 +114,7 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "Credenciales incorrectas. No autorizado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante la autenticación")
     })
+    
     public ResponseEntity<?> login(@RequestBody LoginRequest request,HttpServletRequest httpRequest) {
         try {
             // Autenticación y generación de token
