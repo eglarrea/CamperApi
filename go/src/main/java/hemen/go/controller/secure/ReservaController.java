@@ -174,7 +174,61 @@ public class ReservaController {
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
     })
-    public ResponseEntity<?> qr(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody QrRequest request, BindingResult result) {
+    public ResponseEntity<Map<String, Object>> qr(
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
+            @Valid @RequestBody QrRequest request,
+            BindingResult result) {
+
+        try {
+            // Validación de errores en la petición
+            if (result.hasErrors()) {
+                List<String> errores = result.getAllErrors().stream()
+                        .map(ObjectError::getDefaultMessage)
+                        .toList();
+                return ResponseEntity.badRequest().body(Map.of("errores", errores));
+            }
+
+            byte[] qrBytes;
+            try {
+                // Buscar la reserva asociada al usuario
+                Reserva reserva = reservaService.buscarReservaPorReservaForToken(
+                        userDetails.getUsername(), request.getIdReserva());
+
+                // Generar token y QR
+                String token = tokenReservaService.generarTokenPuerta(
+                        reserva.getPersona().getId(),
+                        request.getIdReserva(),
+                        reserva.getPlaza().getParking().getId()
+                );
+
+                qrBytes = tokenReservaService.generarQRBytes(token);
+
+            } catch (WriterException | IOException e) {
+                logger.error("Error generando QR: {}", e.getMessage(), e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", messageSource.getMessage("error.generar.qr", null, LocaleContextHolder.getLocale() )));
+            }
+
+            // Validar que se generó correctamente
+            if (qrBytes == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", messageSource.getMessage("error.generar.vacio.qra", null, LocaleContextHolder.getLocale())));
+            }
+
+            // Codificar en Base64
+            String qrBase64 = Base64.getEncoder().encodeToString(qrBytes);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("qrBase64", qrBase64);
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("Datos no válidos: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    /*public ResponseEntity<?> qr(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody QrRequest request, BindingResult result) {
     	try {
     		if (result.hasErrors()) {
     	        List<String> errores = result.getAllErrors().stream()
@@ -213,6 +267,6 @@ public class ReservaController {
     		            " (valor: " + v.getInvalidValue() + ")").toList();
     		return ResponseEntity.badRequest().body(errores);
         }
-    }
+    }*/
 
 }
