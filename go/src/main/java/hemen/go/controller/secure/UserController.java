@@ -14,14 +14,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import hemen.go.dto.request.RegisterRequest;
-import hemen.go.entity.Usuario;
+import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -77,8 +76,9 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = "Acceso denegado. El rol no tiene permisos"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado en la base de datos")
     })
-    public Usuario getMyData(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails) {
-    	return userService.getMyData(userDetails.getUsername());
+    public ResponseEntity<?> getMyData(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails) {
+    	UserDtoResponse usuarioResponse =  userService.getMyData(userDetails.getUsername());
+    	 return ResponseEntity.ok(usuarioResponse);
         /*return usuarioRepository.findByEmailPersona(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));*/
     }

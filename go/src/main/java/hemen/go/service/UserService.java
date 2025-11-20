@@ -85,7 +85,7 @@ public class UserService {
      * @throws UsernameNotFoundException si el usuario no existe.
      */
     public UserDtoResponse findByEmail(String email) {
-        Usuario user = usuarioRepository.findByEmailPersona(email)
+      /*  Usuario user = usuarioRepository.findByEmailPersona(email)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
@@ -99,7 +99,12 @@ public class UserService {
                 user.getEmailPersona(),
                 user.is_admin(),
                 user.getEmpresa() != null ? user.getEmpresa().getNombreEmpresa() : null
-        );
+        );*/
+    	return usuarioRepository.findByEmailPersona(email)
+                .map(UserDtoResponse::new)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+        
     }
     
     /**
@@ -109,10 +114,14 @@ public class UserService {
      * @return entidad {@link Usuario}.
      * @throws ResponseStatusException si el usuario no existe (404).
      */
-    public Usuario getMyData(String email) {
-        String mensaje = messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale());
+    public UserDtoResponse getMyData(String email) {
+       /* String mensaje = messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale());
         return usuarioRepository.findByEmailPersona(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensaje));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensaje));*/
+        return usuarioRepository.findByEmailPersona(email)
+                .map(UserDtoResponse::new)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
     }
     
     /**
