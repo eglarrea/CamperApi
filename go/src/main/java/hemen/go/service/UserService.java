@@ -1,5 +1,9 @@
 package hemen.go.service;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -8,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import hemen.go.controller.secure.ReservaController;
 import hemen.go.dto.request.RegisterRequest;
+import hemen.go.dto.response.ReservaResponse;
 import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.entity.Usuario;
 import hemen.go.repository.UsuarioRepository;
@@ -34,7 +40,7 @@ import hemen.go.repository.UsuarioRepository;
  */
 @Service
 public class UserService {
-
+	 private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     /** Repositorio para acceder a los usuarios en la base de datos. */
     private final UsuarioRepository usuarioRepository;
     
@@ -193,5 +199,20 @@ public class UserService {
                 usua.is_admin(),
                 usua.getEmpresa() != null ? usua.getEmpresa().getNombreEmpresa() : null
         );
+    }
+    
+    public List<UserDtoResponse> findByCompanyId(String email) {
+    	 Usuario user = usuarioRepository.findByEmailPersona(email)
+                 .orElseThrow(() -> new UsernameNotFoundException(
+                         messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+    	 if(null==user.getEmpresa() || null==user.getEmpresa().getId()) {
+    		 logger.error("El usuario email"+  email + " no tiene empresa asociada");
+    		 throw new UsernameNotFoundException(
+                     messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale()));
+    	 }
+    	 List<Usuario> usuarios = usuarioRepository.findByEmpresa_Id(user.getEmpresa().getId().longValue());
+        return usuarios.stream()
+                .map(UserDtoResponse::new)
+                .toList();
     }
 }

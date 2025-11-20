@@ -134,7 +134,7 @@ public class ReservaController {
         	//TODO VER QUE DATOS NECESITAMOS PARA HACER EL REPONSE 
             Reserva reserva = reservaService.getReservaByIdAndUsuarioEmail(id, userDetails.getUsername());
            // ReservaDtoResponse response = new ReservaDtoResponse(reserva);
-            return ResponseEntity.ok("ok");
+            return ResponseEntity.ok(reserva);
         } catch (NoSuchElementException e) {
             String mensaje = messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensaje);
@@ -161,7 +161,7 @@ public class ReservaController {
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
     })
-    public ResponseEntity<?> candelarReservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody CancelarReservaRequest request, BindingResult result) {
+    public ResponseEntity<?> cancelarReservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody CancelarReservaRequest request, BindingResult result) {
     	try {
     		if (result.hasErrors()) {
     	        List<String> errores = result.getAllErrors().stream()
@@ -190,7 +190,7 @@ public class ReservaController {
     
     @PostMapping("/qr")
     @Operation(
-        summary = "Obtener el codigo qr de la reserva",
+        summary = "Obtener el código qr de la reserva",
         description = "Realiza una reserva en un parking"
                     + "Si los datos son válidos ",
         parameters = {                    		  

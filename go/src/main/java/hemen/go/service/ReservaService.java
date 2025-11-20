@@ -3,7 +3,6 @@ package hemen.go.service;
 import java.sql.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -25,13 +24,11 @@ public class ReservaService {
 	private final UsuarioRepository usuarioRepository;
 	private final ReservaRepository reservaRepository;
 	private final MessageSource messageSource;
-	private final TokenReservaService tokenReservaService;
 	
-	public ReservaService(UsuarioRepository usuarioRepository, ReservaRepository reservaRepository,  MessageSource messageSource, TokenReservaService tokenReservaService) {
+	public ReservaService(UsuarioRepository usuarioRepository, ReservaRepository reservaRepository,  MessageSource messageSource) {
         this.usuarioRepository = usuarioRepository;
         this.messageSource = messageSource;
         this.reservaRepository = reservaRepository;
-        this.tokenReservaService = tokenReservaService;
     }
 	
 	public void reservar(String email, ReservaRequest request) {
