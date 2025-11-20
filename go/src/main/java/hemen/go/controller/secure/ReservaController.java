@@ -134,7 +134,7 @@ public class ReservaController {
         	//TODO VER QUE DATOS NECESITAMOS PARA HACER EL REPONSE 
             Reserva reserva = reservaService.getReservaByIdAndUsuarioEmail(id, userDetails.getUsername());
            // ReservaDtoResponse response = new ReservaDtoResponse(reserva);
-            return ResponseEntity.ok("ok");
+            return ResponseEntity.ok(reserva);
         } catch (NoSuchElementException e) {
             String mensaje = messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensaje);
