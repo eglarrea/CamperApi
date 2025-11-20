@@ -15,7 +15,7 @@ public class Empresa {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "empresa_seq")
     @SequenceGenerator(name = "empresa_seq", sequenceName = "empresa_id_empresa_seq", allocationSize = 1)
     @Column(name = "id_empresa")
-    private Integer id;
+    private Long id;
 
     @Column(name = "nombre_empresa", length = 50, nullable = false)
     private String nombreEmpresa;
@@ -23,11 +23,11 @@ public class Empresa {
     @Column(name = "cif_empresa", length = 15, nullable = false)
     private String cifEmpresa;
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

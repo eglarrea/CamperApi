@@ -70,6 +70,20 @@ public class UserDtoResponse {
 
     /** Constructor vacío (necesario para deserialización JSON) */
     public UserDtoResponse() {}
+    
+    public UserDtoResponse(hemen.go.entity.Usuario usuario) {
+    	this.id= usuario.getId();
+    	this.nombrePersona= usuario.getNombre_persona();
+    	this.apellidosPersona=usuario.getApellidos_persona();
+    	this.dniPersona=usuario.getDni_persona();
+    	this.ibanPersona=usuario.getIban_persona();
+    	this.fecNacimientoPersona=usuario.getFec_nacimiento_persona();
+    	if(null!=usuario.getEmpresa()){
+    		this.empresaNombre=usuario.getEmpresa().getNombreEmpresa();
+    	}
+    	this.isAdmin=usuario.is_admin();
+    	
+    }
 
     /**
      * Constructor con parámetros.

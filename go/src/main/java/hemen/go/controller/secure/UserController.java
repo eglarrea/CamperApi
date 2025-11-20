@@ -51,33 +51,7 @@ public class UserController {
         this.messageSource = messageSource;
     }
 
-    /**
-     * Endpoint para que el ADMIN consulte los datos de cualquier usuario por id.
-     */
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(
-        summary = "Obtener usuario por ID",
-        description = "Este endpoint permite a un administrador obtener los datos de un usuario específico mediante su ID.",
-   		security = { @SecurityRequirement (name = "bearerAuth") },
-		parameters = {                    		  
-            @Parameter(
-          		   name = "Accept-Language",
-                     description = "Idioma de la respuesta (es, en, eu)",
-                     in = ParameterIn.HEADER,
-                     required = false
-          		  )
-          }
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Usuario encontrado correctamente"),
-        @ApiResponse(responseCode = "403", description = "Acceso denegado. Solo administradores pueden usar este endpoint"),
-        @ApiResponse(responseCode = "404", description = "Usuario no encontrado con el ID proporcionado")
-    })
    
-    public Usuario getUserById(@PathVariable Long id) {
-    	return userService.getUserById(id);
-    }
 
     /**
      * Endpoint para que el usuario autenticado consulte sus propios datos.

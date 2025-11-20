@@ -161,7 +161,7 @@ public class ReservaController {
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
     })
-    public ResponseEntity<?> candelarReservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody CancelarReservaRequest request, BindingResult result) {
+    public ResponseEntity<?> cancelarReservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody CancelarReservaRequest request, BindingResult result) {
     	try {
     		if (result.hasErrors()) {
     	        List<String> errores = result.getAllErrors().stream()
@@ -190,7 +190,7 @@ public class ReservaController {
     
     @PostMapping("/qr")
     @Operation(
-        summary = "Obtener el codigo qr de la reserva",
+        summary = "Obtener el código qr de la reserva",
         description = "Realiza una reserva en un parking"
                     + "Si los datos son válidos ",
         parameters = {                    		  

@@ -74,7 +74,6 @@ public class ParkingController {
     		  String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
     	} catch (IllegalArgumentException e) {
-                // Log de error con credenciales inválidas
                 logger.error("Datos no validos: {}", e.getMessage());  
                 return ResponseEntity.badRequest().body(e.getMessage());
     	} catch (jakarta.validation.ConstraintViolationException e) {
