@@ -76,7 +76,7 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = "Acceso denegado. El rol no tiene permisos"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado en la base de datos")
     })
-    public ResponseEntity<?> getMyData(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails) {
+    public ResponseEntity<UserDtoResponse> getMyData(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails) {
     	UserDtoResponse usuarioResponse =  userService.getMyData(userDetails.getUsername());
     	 return ResponseEntity.ok(usuarioResponse);
         /*return usuarioRepository.findByEmailPersona(userDetails.getUsername())
