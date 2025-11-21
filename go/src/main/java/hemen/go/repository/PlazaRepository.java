@@ -2,6 +2,7 @@ package hemen.go.repository;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +18,7 @@ public interface PlazaRepository extends JpaRepository<Plaza, Long> {
 			+ "  AND r.fecFin > :fechaDesde "
 			+ "  AND r.estado = '1' WHERE r.id IS NULL")
 	List<Plaza> findAllByPlazasLibres(@Param("fechaDesde") Date fechaDesde, @Param("fechaHasta") Date fechaHasta);
+	
+	Optional<Plaza> findByIdAndParking_Empresa_Id(Long idPlaza, Long idEmpresa);
 
 }

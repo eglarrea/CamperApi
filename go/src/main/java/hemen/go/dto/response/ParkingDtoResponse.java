@@ -1,5 +1,8 @@
 package hemen.go.dto.response;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ParkingDtoResponse {
 
 	 private Long id;
@@ -8,8 +11,32 @@ public class ParkingDtoResponse {
 	 private boolean tomaElectricidad;
 	 private boolean limpiezaAguasResiduales;
 	 private boolean plazasVip;
+	 private Integer numeroPlazas;
+	 private List<PlazaResponse> plazasResponse;
 	 
 	 public ParkingDtoResponse(){}
+	 
+	 public ParkingDtoResponse(hemen.go.entity.Parking parking){
+		 
+		 this.id =parking.getId();
+		 this.limpiezaAguasResiduales= parking.isTieneResiduales();
+		 this.plazasVip=parking.isTieneElectricidad();
+		 this.tomaElectricidad=parking.isTieneElectricidad();
+		 this.nombre= parking.getNombre();
+		 this.localidad=parking.getMunicipio();
+		 this.numeroPlazas=0;
+		 if (parking.getPlazas() != null && !parking.getPlazas().isEmpty()) {
+	            this.numeroPlazas = parking.getPlazas().size();
+	            this.plazasResponse = parking.getPlazas()
+	                                         .stream()
+	                                         .map(PlazaResponse::new) // usar constructor DTO
+	                                         .collect(Collectors.toList());
+	        } else {
+	            this.numeroPlazas = 0;
+	            this.plazasResponse = List.of(); // lista vacía
+	        }
+		 
+	 }
 	 
 	 public ParkingDtoResponse(Long id, String nombre, String localidad, boolean tomaElectricidad,
 			boolean limpiezaAguasResiduales, boolean plazasVip) {
@@ -68,5 +95,21 @@ public class ParkingDtoResponse {
 
 	public void setPlazasVip(boolean plazasVip) {
 		this.plazasVip = plazasVip;
+	}
+
+	public Integer getNumeroPlazas() {
+		return numeroPlazas;
+	}
+
+	public void setNumeroPlazas(Integer numeroPlazas) {
+		this.numeroPlazas = numeroPlazas;
+	}
+
+	public List<PlazaResponse> getPlazasResponse() {
+		return plazasResponse;
+	}
+
+	public void setPlazasResponse(List<PlazaResponse> plazasResponse) {
+		this.plazasResponse = plazasResponse;
 	}
 }
