@@ -38,4 +38,6 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 			" WHERE r.fecInicio IS NULL OR (r.estado = '1' AND r.fecInicio NOT BETWEEN :fechaDesde AND :fechaHasta " +
 			" AND r.fecFin NOT BETWEEN :fechaDesde AND :fechaHasta)") 
 	List<Parking> findAllByPlazasLibres(@Param("fechaDesde") Date fechaDesde, @Param("fechaHasta") Date fechaHasta);
+	
+	List<Parking> findByEmpresa_Id(Long idEmpresa);
 }

@@ -36,147 +36,119 @@ import jakarta.validation.Valid;
  *
  * Endpoints expuestos bajo la ruta "/api/public/auth".
  * 
- * Funcionalidades principales:
- *  - Login de usuarios con email y contraseña.
- *  - Retorno de un token JWT junto con los datos del usuario autenticado.
- *  - Manejo de errores de credenciales inválidas con mensajes internacionalizados.
+ * Funcionalidades principales: - Login de usuarios con email y contraseña. -
+ * Retorno de un token JWT junto con los datos del usuario autenticado. - Manejo
+ * de errores de credenciales inválidas con mensajes internacionalizados.
  */
 @RestController
 @RequestMapping("/api/public/auth")
-@Tag(name="Autenticación y Registro")
+@Tag(name = "Autenticación y Registro")
 public class AuthController {
 
-    // Logger para registrar eventos y errores
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+	// Logger para registrar eventos y errores
+	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    // Servicios necesarios para autenticación y gestión de usuarios
-    private final AuthService authService;
-    private final UserService userService;
+	// Servicios necesarios para autenticación y gestión de usuarios
+	private final AuthService authService;
+	private final UserService userService;
 
-    // Fuente de mensajes para internacionalización (i18n)
-    private final MessageSource messageSource;
-    
-    /**
-     * Constructor con inyección de dependencias.
-     *
-     * @param authService servicio de autenticación (login, registro, generación de JWT).
-     * @param userService servicio de gestión de usuarios (consultas, datos).
-     * @param messageSource fuente de mensajes para internacionalización.
-     */
-    public AuthController(AuthService authService, UserService userService, MessageSource messageSource) {
-        this.authService = authService;
-        this.userService = userService;
-        this.messageSource = messageSource;
-    }
+	// Fuente de mensajes para internacionalización (i18n)
+	private final MessageSource messageSource;
 
-    /**
-     * Endpoint POST para login de usuarios.
-     *
-     * Flujo:
-     *  1. Recibe un objeto LoginRequest con email y contraseña.
-     *  2. Llama a AuthService.authenticate() para validar credenciales y generar token JWT.
-     *  3. Recupera los datos del usuario con UserService.findByEmail().
-     *  4. Devuelve un objeto JwtResponse con el token y los datos del usuario.
-     *
-     * Manejo de errores:
-     *  - Si las credenciales son inválidas, se captura BadCredentialsException.
-     *  - Se registra el error en el log.
-     *  - Se devuelve un mensaje internacionalizado (auth.invalid.credentials) con estado HTTP 401.
-     *
-     * @param request objeto con email y contraseña.
-     * @return ResponseEntity con JwtResponse si éxito, o mensaje de error si fallo.
-     */
-    @PostMapping("/login")
-    @Operation(
-        summary = "Loguearse en la API",
-        description = "Permite a un usuario autenticarse con su email y contraseña. " +
-                      "Si las credenciales son válidas, devuelve un token JWT junto con los datos del usuario.",
-        parameters = {                    		  
-              @Parameter(
-            		   name = "Accept-Language",
-                       description = "Idioma de la respuesta (es, en, eu)",
-                       in = ParameterIn.HEADER,
-                       required = false
-            		  )
-        }
-    )
-    @ApiResponses(value = {
-        @ApiResponse (responseCode = "200", description = "Autenticación exitosa. Devuelve token y datos del usuario"),
-        @ApiResponse(responseCode = "400", description = "Solicitud inválida. El cuerpo de la petición no cumple el formato esperado"),
-        @ApiResponse(responseCode = "401", description = "Credenciales incorrectas. No autorizado"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor durante la autenticación")
-    })
-    
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            // Autenticación y generación de token
-            String token = authService.authenticate(request.getEmail(), request.getPassword());
+	/**
+	 * Constructor con inyección de dependencias.
+	 *
+	 * @param authService   servicio de autenticación (login, registro, generación
+	 *                      de JWT).
+	 * @param userService   servicio de gestión de usuarios (consultas, datos).
+	 * @param messageSource fuente de mensajes para internacionalización.
+	 */
+	public AuthController(AuthService authService, UserService userService, MessageSource messageSource) {
+		this.authService = authService;
+		this.userService = userService;
+		this.messageSource = messageSource;
+	}
 
-            // Recuperar datos del usuario
-            UserDtoResponse user = userService.findByEmail(request.getEmail());
+	/**
+	 * Endpoint POST para login de usuarios.
+	 *
+	 * Flujo: 1. Recibe un objeto LoginRequest con email y contraseña. 2. Llama a
+	 * AuthService.authenticate() para validar credenciales y generar token JWT. 3.
+	 * Recupera los datos del usuario con UserService.findByEmail(). 4. Devuelve un
+	 * objeto JwtResponse con el token y los datos del usuario.
+	 *
+	 * Manejo de errores: - Si las credenciales son inválidas, se captura
+	 * BadCredentialsException. - Se registra el error en el log. - Se devuelve un
+	 * mensaje internacionalizado (auth.invalid.credentials) con estado HTTP 401.
+	 *
+	 * @param request objeto con email y contraseña.
+	 * @return ResponseEntity con JwtResponse si éxito, o mensaje de error si fallo.
+	 */
+	@PostMapping("/login")
+	@Operation(summary = "Loguearse en la API", description = "Permite a un usuario autenticarse con su email y contraseña. "
+			+ "Si las credenciales son válidas, devuelve un token JWT junto con los datos del usuario.", parameters = {
+					@Parameter(name = "Accept-Language", description = "Idioma de la respuesta (es, en, eu)", in = ParameterIn.HEADER, required = false) })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Autenticación exitosa. Devuelve token y datos del usuario"),
+			@ApiResponse(responseCode = "400", description = "Solicitud inválida. El cuerpo de la petición no cumple el formato esperado"),
+			@ApiResponse(responseCode = "401", description = "Credenciales incorrectas. No autorizado"),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor durante la autenticación") })
 
-            // Retornar token + datos del usuario
-            return ResponseEntity.ok(new JwtResponse(token, user));
-        } catch (BadCredentialsException e) {
-            // Log de error con credenciales inválidas
-            logger.error("Credenciales no válidas para email: {} y password: {}", request.getEmail(), request.getPassword());
-            // Mensaje internacionalizado según el idioma del cliente
-            String mensaje = messageSource.getMessage("auth.invalid.credentials", null, LocaleContextHolder.getLocale());
-            // Respuesta con estado 401 Unauthorized
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
-        }
-    }
+	public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+		try {
+			// Autenticación y generación de token
+			String token = authService.authenticate(request.getEmail(), request.getPassword());
 
-    
-    
-    @PostMapping("/register")
-    @Operation(
-        summary = "Registrarse en la aplicación",
-        description = "Permite a un nuevo usuario registrarse en la aplicación enviando sus datos personales. "
-                    + "Si los datos son válidos y no existe un usuario con el mismo email, se crea el registro.",
-        parameters = {                    		  
-            @Parameter(
-          		   name = "Accept-Language",
-                     description = "Idioma de la respuesta (es, en, eu)",
-                     in = ParameterIn.HEADER,
-                     required = false
-          		  )
-          }
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),
-        @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
-        @ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
-    })
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request, BindingResult result) {
-    	try {
-    		if (result.hasErrors()) {
-    	        List<String> errores = result.getAllErrors().stream()
-    	            .map(ObjectError::getDefaultMessage) // aquí ya viene interpolado
-    	            .toList();
-    	        return ResponseEntity.badRequest().body(errores);
-    	    }
-    		
-    		authService.register(request);
-    		return ResponseEntity.ok(messageSource.getMessage("message.ok.usuario.creado", null, LocaleContextHolder.getLocale()));
-    	} catch (DataIntegrityViolationException ex) {
-    		  String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale() );
-    	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
-    	} catch (IllegalArgumentException e) {
-                // Log de error con credenciales inválidas
-                logger.error("Datos no validos: {}", e.getMessage());  
-                return ResponseEntity.badRequest().body(e.getMessage());
-    	} catch (jakarta.validation.ConstraintViolationException e) {
-    		List<String> errores = e.getConstraintViolations().stream()
-    		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
-    		            " (valor: " + v.getInvalidValue() + ")").toList();
+			// Recuperar datos del usuario
+			UserDtoResponse user = userService.findByEmail(request.getEmail());
 
-    		return ResponseEntity.badRequest().body(errores);
-        }
-    }
-    
-    
-    
-    
+			// Retornar token + datos del usuario
+			return ResponseEntity.ok(new JwtResponse(token, user));
+		} catch (BadCredentialsException e) {
+			// Log de error con credenciales inválidas
+			logger.error("Credenciales no válidas para email: {} y password: {}", request.getEmail(),
+					request.getPassword());
+			// Mensaje internacionalizado según el idioma del cliente
+			String mensaje = messageSource.getMessage("auth.invalid.credentials", null,
+					LocaleContextHolder.getLocale());
+			// Respuesta con estado 401 Unauthorized
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
+		}
+	}
+
+	@PostMapping("/register")
+	@Operation(summary = "Registrarse en la aplicación", description = "Permite a un nuevo usuario registrarse en la aplicación enviando sus datos personales. "
+			+ "Si los datos son válidos y no existe un usuario con el mismo email, se crea el registro.", parameters = {
+					@Parameter(name = "Accept-Language", description = "Idioma de la respuesta (es, en, eu)", in = ParameterIn.HEADER, required = false) })
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Usuario registrado correctamente"),
+			@ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
+			@ApiResponse(responseCode = "409", description = "Conflicto. Ya existe un usuario con el mismo email"),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro") })
+	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request, BindingResult result) {
+		try {
+			if (result.hasErrors()) {
+				List<String> errores = result.getAllErrors().stream().map(ObjectError::getDefaultMessage) // aquí ya
+																											// viene
+																											// interpolado
+						.toList();
+				return ResponseEntity.badRequest().body(errores);
+			}
+
+			authService.register(request);
+			return ResponseEntity
+					.ok(messageSource.getMessage("message.ok.usuario.creado", null, LocaleContextHolder.getLocale()));
+		} catch (DataIntegrityViolationException ex) {
+			String mensaje = messageSource.getMessage("error.existe.usuario", null, LocaleContextHolder.getLocale());
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
+		} catch (IllegalArgumentException e) {
+			// Log de error con credenciales inválidas
+			logger.error("Datos no validos: {}", e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		} catch (jakarta.validation.ConstraintViolationException e) {
+			List<String> errores = e.getConstraintViolations().stream().map(v -> "Campo '" + v.getPropertyPath() + "' "
+					+ v.getMessage() + " (valor: " + v.getInvalidValue() + ")").toList();
+
+			return ResponseEntity.badRequest().body(errores);
+		}
+	}
 }
