@@ -127,8 +127,6 @@ public class AuthController {
         }
     }
 
-    
-    
     @PostMapping("/register")
     @Operation(
         summary = "Registrarse en la aplicación",
@@ -175,8 +173,4 @@ public class AuthController {
     		return ResponseEntity.badRequest().body(errores);
         }
     }
-    
-    
-    
-    
 }
