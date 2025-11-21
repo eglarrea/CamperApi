@@ -15,10 +15,12 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
                 		//.allowedOrigins("null");
+                		.allowedOrigins("http://127.0.0.1:4200")
                 		.allowedOrigins("http://localhost:4200")
                 		.allowedOrigins("https://prueba-pyxw.onrender.com")
                 		.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                		.allowedHeaders("*");
+                		.allowedHeaders("*")
+                		.allowCredentials(true);
                         //.allowedOrigins("http://localhost:3000", "http://127.0.0.1:5500") // tu frontend
                         //.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         //.allowedHeaders("*");

@@ -60,7 +60,10 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+            .cors() // habilita CORS para que use tu configuración global o un CorsConfigurationSource
+            .and()
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 // Swagger y OpenAPI deben ser públicos
                 .requestMatchers(
@@ -85,6 +88,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     /**
      * Bean para obtener el AuthenticationManager.
