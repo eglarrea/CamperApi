@@ -15,6 +15,7 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
                 		//.allowedOrigins("null");
+                		.allowedOrigins("http://localhost:4200")
                 		.allowedOrigins("https://prueba-pyxw.onrender.com")
                 		.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 		.allowedHeaders("*");
