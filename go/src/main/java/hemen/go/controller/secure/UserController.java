@@ -92,6 +92,7 @@ public class UserController {
         summary = "Actualizar datos del usuario autenticado",
         description = "Permite a un usuario autenticado (roles USER o ADMIN) actualizar sus datos personales. "
                     + "El cuerpo de la petición debe contener los campos a modificar.",
+        security = { @SecurityRequirement(name = "bearerAuth") },
         parameters = {                    		  
 	        @Parameter(
 	      		   name = "Accept-Language",

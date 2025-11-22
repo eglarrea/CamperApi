@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -39,6 +40,7 @@ public class HistoricoController {
     @Operation(
         summary = "Obtener listado de historico de reservas",
         description = "Devuelve el listado de historico de reservas",
+        security = { @SecurityRequirement(name = "bearerAuth") },
 		parameters = {                    		  
 	              @Parameter(
 	            		   name = "Accept-Language",

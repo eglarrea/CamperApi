@@ -39,6 +39,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -64,10 +65,12 @@ public class ReservaController {
     }
     
     @PostMapping
+    @PreAuthorize("hasAnyRole('USER')")
     @Operation(
         summary = "Realizar una reserva en un parking",
         description = "Realiza una reserva en un parking "
                     + "Si los datos son válidos ",
+        security = { @SecurityRequirement(name = "bearerAuth") },
         parameters = {                    		  
             @Parameter(
           		   name = "Accept-Language",
@@ -77,7 +80,6 @@ public class ReservaController {
           		  )
           }
     )
-    @PreAuthorize("hasAnyRole('USER')")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Reserva realizada correctamente"),
         @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
@@ -109,9 +111,11 @@ public class ReservaController {
     }
     
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER')")
     @Operation(
         summary = "Obtener detalle de una reserva",
         description = "Devuelve el detalle completo de una reserva por su identificador",
+        security = { @SecurityRequirement(name = "bearerAuth") },
 		parameters = {                    		  
 	            @Parameter(
 	          		   name = "Accept-Language",
@@ -121,7 +125,6 @@ public class ReservaController {
 	          		  )
 	          }
     )
-    @PreAuthorize("hasAnyRole('USER')")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Detalle de la reserva devuelto correctamente"),
         @ApiResponse(responseCode = "404", description = "La reserva no existe o no pertenece al usuario"),
@@ -146,6 +149,7 @@ public class ReservaController {
         summary = "Cancelar una reserva",
         description = "Cancela la reserva realizada"
                     + "Si los datos son válidos ",
+        security = { @SecurityRequirement(name = "bearerAuth") },
         parameters = {                    		  
             @Parameter(
           		   name = "Accept-Language",
@@ -193,6 +197,7 @@ public class ReservaController {
         summary = "Obtener el código qr de la reserva",
         description = "Realiza una reserva en un parking"
                     + "Si los datos son válidos ",
+        security = { @SecurityRequirement(name = "bearerAuth") },
         parameters = {                    		  
             @Parameter(
           		   name = "Accept-Language",
