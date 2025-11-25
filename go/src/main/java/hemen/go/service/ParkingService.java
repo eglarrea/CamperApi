@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import hemen.go.dto.request.FilterParkingRequest;
 import hemen.go.dto.response.FilterParkingResponse;
 import hemen.go.dto.response.ParkingDtoResponse;
-import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.entity.Parking;
 import hemen.go.entity.Usuario;
 import hemen.go.repository.ParkingRepository;
@@ -54,10 +53,9 @@ public class ParkingService {
 	        return new FilterParkingResponse(mockParkings);
 	    }
 	 
-	 public List<Parking> findAll() {
+	 public List<ParkingDtoResponse> findAll() {
 		 	List<Parking>  listParking = parkingRepository.findAll();
-
-	        return listParking;
+		 	return listParking.stream().map(ParkingDtoResponse::new).toList();
 	 }
 	 
 
