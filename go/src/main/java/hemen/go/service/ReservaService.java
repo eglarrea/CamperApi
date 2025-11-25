@@ -1,9 +1,12 @@
 package hemen.go.service;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +27,9 @@ public class ReservaService {
 	private final UsuarioRepository usuarioRepository;
 	private final ReservaRepository reservaRepository;
 	private final MessageSource messageSource;
+	
+	@Value("${reserva.cancelacion.dias}")
+	private int diasCancelacion;
 	
 	public ReservaService(UsuarioRepository usuarioRepository, ReservaRepository reservaRepository,  MessageSource messageSource) {
         this.usuarioRepository = usuarioRepository;
@@ -72,13 +78,6 @@ public class ReservaService {
        
         
         reservaRepository.save(reserva);
-
-        // 2. Generar el token usando la reserva ya guardada (con id)
-        /*String token = tokenReservaService.generarToken(guardada);
-        guardada.setToken(token);
-
-        // 3. Actualizar la reserva con el token
-        reservaRepository.save(guardada);*/
     }
 	
 	/*public Reserva buscarReservaPorReservaToken(Long idUsuario, Long idReserva, String token) {
@@ -86,7 +85,7 @@ public class ReservaService {
 	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 	}*/
 	
-	public void cancelarReserve(String email, Long idReserva) {
+	/*public void cancelarReserve(String email, Long idReserva) {
 		Usuario user = usuarioRepository.findByEmailPersona(email)
                 .orElseThrow(() -> new UsernameNotFoundException( messageSource.getMessage(
                         "error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
@@ -94,6 +93,36 @@ public class ReservaService {
         .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 		reserva.setEstado("0");
 		reservaRepository.save(reserva);
+	}*/
+	public void cancelarReserve(String email, Long idReserva) {
+	 Usuario user = usuarioRepository.findByEmailPersona(email)
+	            .orElseThrow(() -> new UsernameNotFoundException(
+	                    messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+
+	    Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado(idReserva, user.getId(), "1")
+	            .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+
+	    LocalDate hoy = LocalDate.now();
+
+		 // Si fecInicio y fecAlta son java.sql.Date
+		 LocalDate fechaInicio = reserva.getFecInicio().toLocalDate();
+		 LocalDate fechaAlta   = reserva.getFecAlta().toLocalDate();
+
+
+	    // Condición 1: faltan al menos X días para inicio
+	    boolean cumpleAntelacion = hoy.plusDays(diasCancelacion).isBefore(fechaInicio);
+
+	    // Condición 2: la reserva se hizo hace <= 6 días
+	    boolean cumpleReciente = ChronoUnit.DAYS.between(fechaAlta, hoy) <= diasCancelacion;
+
+	    if (!(cumpleAntelacion || cumpleReciente)) {
+	        throw new IllegalArgumentException(messageSource.getMessage("error.reserva.cancelacion",
+	                new Object[]{diasCancelacion, diasCancelacion},
+	                LocaleContextHolder.getLocale()));
+	    }
+
+	    reserva.setEstado("0");
+	    reservaRepository.save(reserva);
 	}
 	
 	public Reserva buscarReservaPorReservaForToken(String email, Long idReserva) {

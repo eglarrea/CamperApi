@@ -183,7 +183,7 @@ public class ReservaController {
     	} catch (IllegalArgumentException e) {
                 logger.error("Datos no validos: {}", e.getMessage());  
                 String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
-                return ResponseEntity.badRequest().body(mensaje);
+                return ResponseEntity.badRequest().body(e.getMessage());
     	} catch (jakarta.validation.ConstraintViolationException e) {
     		List<String> errores = e.getConstraintViolations().stream()
     		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
