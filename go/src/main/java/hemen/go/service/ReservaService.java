@@ -6,12 +6,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import hemen.go.controller.secure.ReservaController;
 import hemen.go.dto.request.ReservaRequest;
 import hemen.go.dto.response.ReservaResponse;
 import hemen.go.entity.Parking;
@@ -23,7 +26,7 @@ import hemen.go.repository.UsuarioRepository;
 
 @Service
 public class ReservaService {
-	
+	private static final Logger logger = LoggerFactory.getLogger(ReservaService.class);
 	private final UsuarioRepository usuarioRepository;
 	private final ReservaRepository reservaRepository;
 	private final MessageSource messageSource;
@@ -108,7 +111,7 @@ public class ReservaService {
 		 LocalDate fechaInicio = reserva.getFecInicio().toLocalDate();
 		 LocalDate fechaAlta   = reserva.getFecAlta().toLocalDate();
 
-
+		logger.error("Dias cancelacion="+diasCancelacion);
 	    // Condición 1: faltan al menos X días para inicio
 	    boolean cumpleAntelacion = hoy.plusDays(diasCancelacion).isBefore(fechaInicio);
 
