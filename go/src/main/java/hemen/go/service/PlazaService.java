@@ -17,6 +17,7 @@ import hemen.go.dto.response.PlazaResponse;
 import hemen.go.entity.Parking;
 import hemen.go.entity.Plaza;
 import hemen.go.entity.Usuario;
+import hemen.go.enums.EstadoPlaza;
 import hemen.go.repository.ParkingRepository;
 import hemen.go.repository.PlazaRepository;
 import hemen.go.repository.UsuarioRepository;
@@ -84,7 +85,7 @@ public class PlazaService {
 	        plaza.setNombre(request.getNombre());
 	        plaza.setEsVip(request.isEsVip());
 	        plaza.setTieneElectricidad(request.isTieneElectricidad());
-	        plaza.setEstado(request.getEstado());
+	        plaza.setEstado(EstadoPlaza.fromCodigo(request.getEstado()));
 	        plaza.setPrecio(request.getPrecio());
 	        plaza.setParking(parking);
 
@@ -124,7 +125,7 @@ public class PlazaService {
 		    plaza.setNombre(request.getNombre());
 		    plaza.setEsVip(request.isEsVip());
 		    plaza.setTieneElectricidad(request.isTieneElectricidad());
-		    plaza.setEstado(request.getEstado());
+		    plaza.setEstado(EstadoPlaza.fromCodigo(request.getEstado()));
 		    plaza.setPrecio(request.getPrecio());
 
 		    // Guardar cambios

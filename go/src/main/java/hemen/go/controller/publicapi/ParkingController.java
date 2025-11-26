@@ -1,5 +1,7 @@
 package hemen.go.controller.publicapi;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import hemen.go.dto.request.FilterParkingRequest;
-import hemen.go.dto.response.FilterParkingResponse;
+import hemen.go.dto.response.ParkingDtoFindResponse;
 import hemen.go.service.ParkingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,8 +32,8 @@ public class ParkingController {
     }
     
     @PostMapping("/find")
-    public ResponseEntity<FilterParkingResponse> buscarParking(@RequestBody FilterParkingRequest request) {
-        FilterParkingResponse response = parkingService.findParkings(request);
+    public ResponseEntity<?>  buscarParking(@RequestBody FilterParkingRequest request) {
+        List<ParkingDtoFindResponse> response = parkingService.findParkings(request);
         return ResponseEntity.ok(response);
     }
     

@@ -99,9 +99,8 @@ public class ReservaController {
     		String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
     	} catch (IllegalArgumentException e) {
-    		String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
             logger.error("Datos no validos: {}", e.getMessage());  
-            return ResponseEntity.badRequest().body(mensaje);
+            return ResponseEntity.badRequest().body(e.getMessage());
     	} catch (jakarta.validation.ConstraintViolationException e) {
     		List<String> errores = e.getConstraintViolations().stream()
     		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
@@ -182,7 +181,6 @@ public class ReservaController {
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
     	} catch (IllegalArgumentException e) {
                 logger.error("Datos no validos: {}", e.getMessage());  
-                String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
                 return ResponseEntity.badRequest().body(e.getMessage());
     	} catch (jakarta.validation.ConstraintViolationException e) {
     		List<String> errores = e.getConstraintViolations().stream()

@@ -15,7 +15,7 @@ public class PlazaResponse {
         this.nombre = plaza.getNombre();
         this.esVip = plaza.isEsVip();
         this.tieneElectricidad = plaza.isTieneElectricidad();
-        this.estado = plaza.getEstado();
+        this.estado = plaza.getEstado() != null ? plaza.getEstado().getCodigo() : null;
         this.precio = plaza.getPrecio();
         this.parkingNombre = plaza.getParking() != null ? plaza.getParking().getNombre() : null;
     }

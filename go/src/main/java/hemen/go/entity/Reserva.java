@@ -1,6 +1,6 @@
 package hemen.go.entity;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -19,33 +19,32 @@ import jakarta.persistence.Table;
 public class Reserva {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reservas_seq")
-    @SequenceGenerator(name = "reservas_seq", sequenceName = "reservas_id_reserva_seq", allocationSize = 1)
-    @Column(name = "id_reserva")
-    private Long id;
-	
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reservas_seq")
+	@SequenceGenerator(name = "reservas_seq", sequenceName = "reservas_id_reserva_seq", allocationSize = 1)
+	@Column(name = "id_reserva")
+	private Long id;
+
 	@ManyToOne
 	@JoinColumn(name = "id_persona_reserva", referencedColumnName = "id_persona")
-	@JsonIgnoreProperties({"reservas"})
+	@JsonIgnoreProperties({ "reservas" })
 	private Usuario persona;
-	 
+
 	@ManyToOne
 	@JoinColumn(name = "id_plaza_reserva", referencedColumnName = "id_plaza")
-	@JsonIgnoreProperties({"reservas"})
+	@JsonIgnoreProperties({ "reservas" })
 	private Plaza plaza;
-	 
-	@Column(name="fecha_inicio_reserva")
-	private Date fecInicio;
-	
-	@Column(name="fecha_fin_reserva")
-	private Date fecFin;
-	
-	@Column(name="fecha_alta_reserva")
-	private Date fecAlta;
-	
+
+	@Column(name = "fecha_inicio_reserva")
+	private LocalDate fecInicio;
+
+	@Column(name = "fecha_fin_reserva")
+	private LocalDate fecFin;
+
+	@Column(name = "fecha_alta_reserva")
+	private LocalDate fecAlta;
+
 	@Column(name = "estado_reserva", length = 1, nullable = false)
 	private String estado;
-	
 
 	public Long getId() {
 		return id;
@@ -55,27 +54,27 @@ public class Reserva {
 		this.id = id;
 	}
 
-	public Date getFecInicio() {
+	public LocalDate getFecInicio() {
 		return fecInicio;
 	}
 
-	public void setFecInicio(Date fecInicio) {
+	public void setFecInicio(LocalDate fecInicio) {
 		this.fecInicio = fecInicio;
 	}
 
-	public Date getFecFin() {
+	public LocalDate getFecFin() {
 		return fecFin;
 	}
 
-	public void setFecFin(Date fecFin) {
+	public void setFecFin(LocalDate fecFin) {
 		this.fecFin = fecFin;
 	}
 
-	public Date getFecAlta() {
+	public LocalDate getFecAlta() {
 		return fecAlta;
 	}
 
-	public void setFecAlta(Date fecAlta) {
+	public void setFecAlta(LocalDate fecAlta) {
 		this.fecAlta = fecAlta;
 	}
 
@@ -85,7 +84,7 @@ public class Reserva {
 
 	public void setEstado(String estado) {
 		this.estado = estado;
-	}	
+	}
 
 	public void setPersona(Usuario persona) {
 		this.persona = persona;
@@ -94,7 +93,7 @@ public class Reserva {
 	public void setPlaza(Plaza plaza) {
 		this.plaza = plaza;
 	}
-	
+
 	public Usuario getPersona() {
 		return persona;
 	}

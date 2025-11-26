@@ -9,11 +9,13 @@ public class FilterParkingRequest {
 
     // Localidad del parking
     private String localidad;
+    
+    private String pronvincia;
 
     // Servicios adicionales
-    private boolean tomaElectricidad;
-    private boolean limpiezaAguasResiduales;
-    private boolean plazasVip;
+    private Boolean tomaElectricidad;
+    private Boolean limpiezaAguasResiduales;
+    private Boolean plazasVip;
 
     // Getters y Setters
     public LocalDate getFechaDesde() {
@@ -40,27 +42,35 @@ public class FilterParkingRequest {
         this.localidad = localidad;
     }
 
-    public boolean isTomaElectricidad() {
+    public Boolean isTomaElectricidad() {
         return tomaElectricidad;
     }
 
-    public void setTomaElectricidad(boolean tomaElectricidad) {
+    public void setTomaElectricidad(Boolean tomaElectricidad) {
         this.tomaElectricidad = tomaElectricidad;
     }
 
-    public boolean isLimpiezaAguasResiduales() {
+    public Boolean isLimpiezaAguasResiduales() {
         return limpiezaAguasResiduales;
     }
 
-    public void setLimpiezaAguasResiduales(boolean limpiezaAguasResiduales) {
+    public void setLimpiezaAguasResiduales(Boolean limpiezaAguasResiduales) {
         this.limpiezaAguasResiduales = limpiezaAguasResiduales;
     }
 
-    public boolean isPlazasVip() {
+    public Boolean isPlazasVip() {
         return plazasVip;
     }
 
-    public void setPlazasVip(boolean plazasVip) {
+    public void setPlazasVip(Boolean plazasVip) {
         this.plazasVip = plazasVip;
     }
+
+	public String getPronvincia() {
+		return pronvincia;
+	}
+
+	public void setPronvincia(String pronvincia) {
+		this.pronvincia = pronvincia;
+	}
 }

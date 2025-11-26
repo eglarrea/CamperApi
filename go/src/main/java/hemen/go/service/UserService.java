@@ -12,9 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import hemen.go.controller.secure.ReservaController;
 import hemen.go.dto.request.RegisterRequest;
-import hemen.go.dto.response.ReservaResponse;
 import hemen.go.dto.response.UserDtoResponse;
 import hemen.go.entity.Usuario;
 import hemen.go.repository.UsuarioRepository;

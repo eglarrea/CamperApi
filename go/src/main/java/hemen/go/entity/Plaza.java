@@ -4,7 +4,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import hemen.go.enums.EstadoPlaza;
+import hemen.go.enums.converter.EstadoPlazaConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,8 +43,11 @@ public class Plaza {
     @Column(name = "tiene_electricidad_plaza")
     private boolean tieneElectricidad;
     
+    
+    @Convert(converter = EstadoPlazaConverter.class)
     @Column(name = "estado_plaza", length = 1, nullable = false)
-    private String estado;
+    private EstadoPlaza estado;
+    
     
     @Column(name = "precio_plaza")
     private float precio;
@@ -93,13 +99,13 @@ public class Plaza {
 		this.tieneElectricidad = tieneElectricidad;
 	}
 
-	public String getEstado() {
-		return estado;
+	public EstadoPlaza getEstado() {
+	    return estado;
 	}
 
-	public void setEstado(String estado) {
-		this.estado = estado;
-	}
+	public void setEstado(EstadoPlaza estado) {
+	    this.estado = estado;
+	}  
 
 	public List<Reserva> getReservas() {
 		return reservas;
