@@ -23,131 +23,204 @@ import hemen.go.repository.ReservaRepository;
 import hemen.go.repository.UsuarioRepository;
 import hemen.go.validator.FechaValidator;
 
+/**
+ * Servicio de gestión de reservas para la aplicación Hemengo.
+ *
+ * Centraliza la lógica de negocio para:
+ * - Crear nuevas reservas con validación de fechas, usuario y solapes.
+ * - Cancelar reservas siguiendo la política de cancelación configurable.
+ * - Consultar reservas activas e históricas de un usuario.
+ *
+ * Notas de negocio:
+ * - El estado "1" se considera reserva activa; "0" cancelada.
+ * - La política de cancelación se evalúa con {@code diasCancelacion} días
+ *   tanto por antelación a la fecha de inicio como por antigüedad de la reserva.
+ */
 @Service
 public class ReservaService {
-	private static final Logger logger = LoggerFactory.getLogger(ReservaService.class);
-	private final UsuarioRepository usuarioRepository;
-	private final ReservaRepository reservaRepository;
-	private final FechaValidator fechaValidator;
-	private final MessageSource messageSource;
 
-	@Value("${reserva.cancelacion.dias}")
-	private int diasCancelacion;
+   
+    private static final Logger logger = LoggerFactory.getLogger(ReservaService.class);
 
-	public ReservaService(UsuarioRepository usuarioRepository, ReservaRepository reservaRepository,
-			FechaValidator fechaValidator, MessageSource messageSource) {
-		this.usuarioRepository = usuarioRepository;
-		this.messageSource = messageSource;
-		this.reservaRepository = reservaRepository;
-		this.fechaValidator = fechaValidator;
-	}
+    private final UsuarioRepository usuarioRepository;
+    private final ReservaRepository reservaRepository;
+    private final FechaValidator fechaValidator;
+    private final MessageSource messageSource;
 
-	public void reservar(String email, ReservaRequest request) {
-		Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
-				messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+    /**
+     * Número de días de política de cancelación.
+     * Inyectado desde la configuración con la clave {@code reserva.cancelacion.dias}.
+     *
+     * Reglas aplicadas:
+     * - Se permite cancelar si faltan al menos {@code diasCancelacion} días para el inicio, o
+     * - Si la reserva se realizó hace {@code diasCancelacion} días o menos.
+     */
+    @Value("${reserva.cancelacion.dias}")
+    private int diasCancelacion;
 
-		if (null == user.getIban_persona() || user.getIban_persona().trim().equals("")) {
-			String mensaje = messageSource.getMessage("user.iban.invalid", null, LocaleContextHolder.getLocale());
-			throw new IllegalArgumentException(mensaje);
-		}
-		fechaValidator.validarFechas(request.getFecInicio(), request.getFecFin());
+    /**
+     * Constructor con inyección de dependencias.
+     *
+     * @param usuarioRepository repositorio de usuarios.
+     * @param reservaRepository repositorio de reservas.
+     * @param fechaValidator validador de fechas para reservas.
+     * @param messageSource fuente de mensajes internacionalizados.
+     */
+    public ReservaService(UsuarioRepository usuarioRepository,
+                          ReservaRepository reservaRepository,
+                          FechaValidator fechaValidator,
+                          MessageSource messageSource) {
+        this.usuarioRepository = usuarioRepository;
+        this.messageSource = messageSource;
+        this.reservaRepository = reservaRepository;
+        this.fechaValidator = fechaValidator;
+    }
 
-		List<Reserva> solapadas = reservaRepository.findReservasSolapadas(request.getIdPlaza(), request.getFecInicio(),
-				request.getFecFin());
+    /**
+     * Registra una nueva reserva para el usuario indicado.
+     *
+     * Flujo:
+     * 1) Verifica que el usuario exista y tenga IBAN registrado.
+     * 2) Valida fechas de inicio y fin mediante {@link FechaValidator}.
+     * 3) Comprueba solapes en la plaza para el rango indicado.
+     * 4) Crea y persiste la reserva como activa.
+     *
+     * @param email correo electrónico del usuario que realiza la reserva.
+     * @param request datos de la reserva: idParking, idPlaza, fechas de inicio y fin.
+     * @throws UsernameNotFoundException si el usuario no existe.
+     * @throws IllegalArgumentException si el IBAN es inválido, las fechas no son válidas
+     *                                  o existen reservas solapadas.
+     */
+    public void reservar(String email, ReservaRequest request) {
+        Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
+                messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
-		if (!solapadas.isEmpty()) {
-			String mensaje = messageSource.getMessage("error.reserva.solapada", null, LocaleContextHolder.getLocale());
-			throw new IllegalArgumentException(mensaje);
-		}
+        if (user.getIban_persona() == null || user.getIban_persona().trim().isEmpty()) {
+            String mensaje = messageSource.getMessage("user.iban.invalid", null, LocaleContextHolder.getLocale());
+            throw new IllegalArgumentException(mensaje);
+        }
 
-		Reserva reserva = new Reserva();
-		Plaza plaza = new Plaza();
-		Parking parking = new Parking();
-		parking.setId(request.getIdParking());
-		plaza.setId(request.getIdPlaza());
+        fechaValidator.validarFechas(request.getFecInicio(), request.getFecFin());
 
-		plaza.setParking(parking);
-		reserva.setPersona(user);
-		reserva.setPlaza(plaza);
-		reserva.setEstado("1");
+        List<Reserva> solapadas = reservaRepository.findReservasSolapadas(
+                request.getIdPlaza(), request.getFecInicio(), request.getFecFin());
 
-		reserva.setFecInicio(request.getFecInicio());
-		reserva.setFecFin(request.getFecFin());
-		reserva.setFecAlta(LocalDate.now());
+        if (!solapadas.isEmpty()) {
+            String mensaje = messageSource.getMessage("error.reserva.solapada", null, LocaleContextHolder.getLocale());
+            throw new IllegalArgumentException(mensaje);
+        }
 
-		reservaRepository.save(reserva);
-	}
+        Reserva reserva = new Reserva();
+        Plaza plaza = new Plaza();
+        Parking parking = new Parking();
+        parking.setId(request.getIdParking());
+        plaza.setId(request.getIdPlaza());
+        plaza.setParking(parking);
 
-	/*
-	 * public Reserva buscarReservaPorReservaToken(Long idUsuario, Long idReserva,
-	 * String token) { return
-	 * reservaRepository.findByUsuarioAndReservaAndToken(idUsuario, idReserva,
-	 * token) .orElseThrow(() -> new
-	 * IllegalArgumentException("No existe la reserva con esos datos")); }
-	 */
+        reserva.setPersona(user);
+        reserva.setPlaza(plaza);
+        reserva.setEstado("1"); // Activa
+        reserva.setFecInicio(request.getFecInicio());
+        reserva.setFecFin(request.getFecFin());
+        reserva.setFecAlta(LocalDate.now());
 
-	/*
-	 * public void cancelarReserve(String email, Long idReserva) { Usuario user =
-	 * usuarioRepository.findByEmailPersona(email) .orElseThrow(() -> new
-	 * UsernameNotFoundException( messageSource.getMessage(
-	 * "error.usuario.no.existe", null, LocaleContextHolder.getLocale()))); Reserva
-	 * reserva = reservaRepository.findByIdAndPersonaIdAndEstado(
-	 * idReserva,user.getId(),"1") .orElseThrow(() -> new
-	 * IllegalArgumentException("No existe la reserva con esos datos"));
-	 * reserva.setEstado("0"); reservaRepository.save(reserva); }
-	 */
-	public void cancelarReserve(String email, Long idReserva) {
-		Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
-				messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+        reservaRepository.save(reserva);
+    }
 
-		Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado(idReserva, user.getId(), "1")
-				.orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+    /**
+     * Cancela una reserva activa del usuario si cumple la política de cancelación.
+     *
+     * Política:
+     * - Antelación: hoy + diasCancelacion &lt; fechaInicio.
+     * - Reciente: días entre fechaAlta y hoy ≤ diasCancelacion.
+     *
+     * Si no se cumple alguna de las dos condiciones, la cancelación no es válida.
+     *
+     * @param email correo electrónico del usuario propietario de la reserva.
+     * @param idReserva identificador de la reserva a cancelar.
+     * @throws UsernameNotFoundException si el usuario no existe.
+     * @throws IllegalArgumentException si la reserva no existe, no está activa
+     *                                  o no cumple la política de cancelación.
+     */
+    public void cancelarReserve(String email, Long idReserva) {
+        Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
+                messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
-		LocalDate hoy = LocalDate.now();
+        Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado(idReserva, user.getId(), "1")
+                .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 
-		// Si fecInicio y fecAlta son java.sql.Date
-		LocalDate fechaInicio = reserva.getFecInicio();
-		LocalDate fechaAlta = reserva.getFecAlta();
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaInicio = reserva.getFecInicio();
+        LocalDate fechaAlta = reserva.getFecAlta();
 
-		logger.error("Dias cancelacion=" + diasCancelacion);
-		// Condición 1: faltan al menos X días para inicio
-		boolean cumpleAntelacion = hoy.plusDays(diasCancelacion).isBefore(fechaInicio);
+        logger.error("Dias cancelacion=" + diasCancelacion);
 
-		// Condición 2: la reserva se hizo hace <= 6 días
-		boolean cumpleReciente = ChronoUnit.DAYS.between(fechaAlta, hoy) <= diasCancelacion;
+        boolean cumpleAntelacion = hoy.plusDays(diasCancelacion).isBefore(fechaInicio);
+        boolean cumpleReciente = ChronoUnit.DAYS.between(fechaAlta, hoy) <= diasCancelacion;
 
-		if (!(cumpleAntelacion || cumpleReciente)) {
-			throw new IllegalArgumentException(messageSource.getMessage("error.reserva.cancelacion",
-					new Object[] { diasCancelacion, diasCancelacion }, LocaleContextHolder.getLocale()));
-		}
+        if (!(cumpleAntelacion || cumpleReciente)) {
+            throw new IllegalArgumentException(messageSource.getMessage(
+                    "error.reserva.cancelacion",
+                    new Object[]{diasCancelacion, diasCancelacion},
+                    LocaleContextHolder.getLocale()
+            ));
+        }
 
-		reserva.setEstado("0");
-		reservaRepository.save(reserva);
-	}
+        reserva.setEstado("0"); // Cancelada
+        reservaRepository.save(reserva);
+    }
 
-	public Reserva buscarReservaPorReservaForToken(String email, Long idReserva) {
+    /**
+     * Busca una reserva activa por usuario y su identificador.
+     *
+     * Nota: El “token” no se gestiona aquí; se asume que {@link ReservaRepository#findReservaActiva}
+     * aplica los criterios necesarios (p. ej., estado y pertenencia).
+     *
+     * @param email correo del usuario.
+     * @param idReserva identificador de la reserva.
+     * @return la reserva activa si existe.
+     * @throws UsernameNotFoundException si el usuario no existe.
+     * @throws IllegalArgumentException si no existe reserva activa con esos datos.
+     */
+    public Reserva buscarReservaPorReservaForToken(String email, Long idReserva) {
+        Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
+                messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+        return reservaRepository.findReservaActiva(user.getId(), idReserva)
+                .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+    }
 
-		Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
-				messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
-		return reservaRepository.findReservaActiva(user.getId(), idReserva)
-				.orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
-	}
+    /**
+     * Obtiene una reserva por su ID y el email del usuario.
+     *
+     * @param idReserva identificador de la reserva.
+     * @param emailUsuario correo electrónico del usuario.
+     * @return la reserva encontrada.
+     * @throws UsernameNotFoundException si el usuario no existe.
+     * @throws NoSuchElementException si no se encuentra la reserva para ese usuario.
+     */
+    public Reserva getReservaByIdAndUsuarioEmail(Long idReserva, String emailUsuario) {
+        Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-	public Reserva getReservaByIdAndUsuarioEmail(Long idReserva, String emailUsuario) {
-		Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
-				.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        return reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
+                .orElseThrow(() -> new NoSuchElementException("Reserva no encontrada"));
+    }
 
-		return reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
-				.orElseThrow(() -> new NoSuchElementException("Reserva no encontrada"));
-	}
+    /**
+     * Devuelve el histórico de reservas de un usuario, ordenado por fecha de alta descendente.
+     *
+     * Conversión:
+     * - Cada {@link Reserva} se transforma a {@link ReservaResponse} para exponer solo los datos necesarios al cliente.
+     *
+     * @param emailUsuario correo electrónico del usuario.
+     * @return lista de respuestas de reservas históricas.
+     * @throws IllegalArgumentException si el usuario no existe.
+     */
+    public List<ReservaResponse> getHistoricoReservas(String emailUsuario) {
+        Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-	public List<ReservaResponse> getHistoricoReservas(String emailUsuario) {
-		Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
-				.orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-
-		List<Reserva> reservas = reservaRepository.findByPersonaIdOrderByFecAltaDesc(usuario.getId());
-
-		return reservas.stream().map(ReservaResponse::new) // convierte cada Reserva en ReservaResponse
-				.toList();
-	}
+        List<Reserva> reservas = reservaRepository.findByPersonaIdOrderByFecAltaDesc(usuario.getId());
+        return reservas.stream().map(ReservaResponse::new).toList();
+    }
 }

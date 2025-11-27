@@ -19,28 +19,31 @@ import hemen.go.security.JwtUtil;
 /**
  * Servicio de autenticación para la aplicación Hemengo.
  *
- * Esta clase encapsula la lógica de autenticación de usuarios y la
- * generación de tokens JWT. Se integra con Spring Security para validar
- * credenciales y con JwtUtil para emitir tokens seguros.
+ * Esta clase centraliza la lógica relacionada con la autenticación y el registro
+ * de usuarios en el sistema. Se integra con Spring Security para validar credenciales
+ * y con {@link JwtUtil} para generar tokens JWT seguros.
  *
- * Funcionalidades principales:
- *  - Validar credenciales de usuario mediante AuthenticationManager.
- *  - Cargar detalles del usuario con UserDetailsService.
- *  - Generar un token JWT válido para el usuario autenticado.
+ * <p>Responsabilidades principales:</p>
+ * <ul>
+ *   <li>Autenticar usuarios mediante {@link AuthenticationManager}.</li>
+ *   <li>Cargar detalles del usuario con {@link UserDetailsService}.</li>
+ *   <li>Generar tokens JWT válidos para sesiones autenticadas.</li>
+ *   <li>Registrar nuevos usuarios en la base de datos con validaciones de negocio.</li>
+ * </ul>
+ *
+ * <p>Excepciones:</p>
+ * <ul>
+ *   <li>{@link IllegalArgumentException} si las contraseñas no coinciden o si la fecha de nacimiento no es válida.</li>
+ * </ul>
  */
 @Service
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-
     private final JwtUtil jwtUtil;
-
     private final UserDetailsService userDetailsService;
-    
     private final PasswordEncoder passwordEncoder;
-    
     private final UsuarioRepository usuarioRepository;
-    
     private final MessageSource messageSource;
 
     /**
@@ -49,62 +52,74 @@ public class AuthService {
      * @param authenticationManager componente de Spring Security para autenticar usuarios.
      * @param jwtUtil utilidad para generar y validar tokens JWT.
      * @param userDetailsService servicio para cargar detalles de usuario.
+     * @param passwordEncoder codificador de contraseñas para almacenamiento seguro.
+     * @param usuarioRepository repositorio para persistir entidades {@link Usuario}.
+     * @param messageSource fuente de mensajes internacionalizados para errores y validaciones.
      */
     public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, 
-    					UserDetailsService userDetailsService,PasswordEncoder passwordEncoder,
-    					UsuarioRepository usuarioRepository, MessageSource messageSource) {
+                       UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
+                       UsuarioRepository usuarioRepository, MessageSource messageSource) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
-        this.usuarioRepository=usuarioRepository;
+        this.usuarioRepository = usuarioRepository;
         this.messageSource = messageSource;
     }
 
     /**
      * Autentica un usuario y genera un token JWT.
      *
-     * Flujo:
-     *  1. Valida las credenciales (email y contraseña) usando AuthenticationManager.
-     *  2. Carga los detalles del usuario (roles, permisos) con UserDetailsService.
-     *  3. Genera un token JWT firmado con la clave secreta.
+     * <p>Flujo:</p>
+     * <ol>
+     *   <li>Valida las credenciales (email y contraseña) usando {@link AuthenticationManager}.</li>
+     *   <li>Carga los detalles del usuario (roles, permisos) con {@link UserDetailsService}.</li>
+     *   <li>Genera un token JWT firmado con la clave secreta.</li>
+     * </ol>
      *
      * @param email correo electrónico del usuario.
      * @param password contraseña del usuario.
      * @return token JWT válido para el usuario autenticado.
+     * @throws org.springframework.security.core.AuthenticationException si las credenciales son inválidas.
      */
     public String authenticate(String email, String password) {
-        // 1. Validar credenciales con Spring Security
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(email, password)
         );
-
-        // 2. Cargar detalles del usuario
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-        // 3. Generar token JWT
         return jwtUtil.generateToken(userDetails);
     }
 
-    
-    
+    /**
+     * Registra un nuevo usuario en el sistema.
+     *
+     * <p>Flujo:</p>
+     * <ol>
+     *   <li>Valida que las contraseñas coincidan.</li>
+     *   <li>Verifica que la fecha de nacimiento corresponda a un usuario mayor de edad (≥ 18 años).</li>
+     *   <li>Encripta la contraseña con {@link PasswordEncoder}.</li>
+     *   <li>Crea una nueva entidad {@link Usuario} con los datos proporcionados.</li>
+     *   <li>Persiste el usuario en la base de datos mediante {@link UsuarioRepository}.</li>
+     * </ol>
+     *
+     * @param request objeto {@link RegisterRequest} con los datos del usuario a registrar.
+     * @throws IllegalArgumentException si las contraseñas no coinciden o si la fecha de nacimiento es inválida.
+     */
     public void register(RegisterRequest request) {
-    	 // 1. Validar que las contraseñas coincidan
         if (!request.getPassPersona().equals(request.getConfirmPassPersona())) {
-        	 String mensaje = messageSource.getMessage(
-                     "error.password.usuario", null, LocaleContextHolder.getLocale());
+            String mensaje = messageSource.getMessage(
+                "error.password.usuario", null, LocaleContextHolder.getLocale());
             throw new IllegalArgumentException(mensaje);
         }
-        if (null!= request.getFecNacimientoPersona() && request.getFecNacimientoPersona().plusYears(18).isAfter(LocalDate.now())) {
-        	String mensaje = messageSource.getMessage(
-                     "user.birthdate.past", null, LocaleContextHolder.getLocale());
+        if (request.getFecNacimientoPersona() != null &&
+            request.getFecNacimientoPersona().plusYears(18).isAfter(LocalDate.now())) {
+            String mensaje = messageSource.getMessage(
+                "user.birthdate.past", null, LocaleContextHolder.getLocale());
             throw new IllegalArgumentException(mensaje);
         }
 
-        // 2. Encriptar la contraseña
         String encodedPassword = passwordEncoder.encode(request.getPassPersona());
 
-        // 3. Crear entidad User
         Usuario user = new Usuario();
         user.setNombre_persona(request.getNombrePersona());
         user.setApellidos_persona(request.getApellidosPersona());
@@ -115,8 +130,6 @@ public class AuthService {
         user.setPass_persona(encodedPassword);
         user.setIs_admin(false);
 
-        // 4. Guardar en la base de datos
         usuarioRepository.save(user);
     }
-    
 }
