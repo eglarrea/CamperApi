@@ -114,7 +114,7 @@ public class ParkingService {
         fechaValidator.validarFechas(request.getFechaDesde(), request.getFechaHasta());
 
         List<Parking> parkings = parkingRepository.findAll(
-                Specification.where(ParkingSpecs.porProvincia(request.getPronvincia()))
+                Specification.where(ParkingSpecs.porProvincia(request.getProvincia()))
                         .and(ParkingSpecs.porMunicipio(request.getLocalidad()))
                         .and(ParkingSpecs.porActivo(true))
                         .and(ParkingSpecs.conElectricidad(request.isTomaElectricidad()))

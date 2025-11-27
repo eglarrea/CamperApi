@@ -10,7 +10,7 @@ public class FilterParkingRequest {
     // Localidad del parking
     private String localidad;
     
-    private String pronvincia;
+    private String provincia;
 
     // Servicios adicionales
     private Boolean tomaElectricidad;
@@ -66,11 +66,11 @@ public class FilterParkingRequest {
         this.plazasVip = plazasVip;
     }
 
-	public String getPronvincia() {
-		return pronvincia;
+	public String getProvincia() {
+		return provincia;
 	}
 
-	public void setPronvincia(String pronvincia) {
-		this.pronvincia = pronvincia;
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
 	}
 }
