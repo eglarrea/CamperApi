@@ -16,6 +16,7 @@ public class ReservaResponse {
 	private LocalDate fecFin;
 	private LocalDate fecAlta;
 	private String estado;
+	private Integer puntuacion;
 
 	// Constructor que recibe la entidad Reserva
 	public ReservaResponse(hemen.go.entity.Reserva reserva) {
@@ -39,6 +40,7 @@ public class ReservaResponse {
 		this.fecFin = reserva.getFecFin();
 		this.fecAlta = reserva.getFecAlta();
 		this.estado = reserva.getEstado();
+		this.puntuacion = reserva.getPuntuacion();
 
 		// Calcular precioTotal = precio * número de días
 		if (fecInicio != null && fecFin != null && precio > 0) {
@@ -100,12 +102,22 @@ public class ReservaResponse {
 	public String getEstado() {
 		return estado;
 	}
+	
+	public Integer getPuntuacion() {
+		return puntuacion;
+	}
+
+	public void setPuntuacion(Integer puntuacion) {
+		this.puntuacion = puntuacion;
+	}
 
 	@Override
 	public String toString() {
 		return "ReservaResponse{" + "id=" + id + ", usuarioId=" + usuarioId + ", usuarioEmail='" + usuarioEmail + '\''
 				+ ", plazaId=" + plazaId + ", parkingId=" + parkingId + ", parkingNombre='" + parkingNombre + '\''
 				+ ", precio=" + precio + ", precioTotal=" + precioTotal + ", fecInicio=" + fecInicio + ", fecFin="
-				+ fecFin + ", fecAlta=" + fecAlta + ", estado='" + estado + '\'' + '}';
+				+ fecFin + ", fecAlta=" + fecAlta + ", estado='" + estado+ ", puntuacion='" + puntuacion + '\'' + '}';
 	}
+
+
 }

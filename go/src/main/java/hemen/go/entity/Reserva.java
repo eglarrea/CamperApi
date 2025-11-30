@@ -45,6 +45,9 @@ public class Reserva {
 
 	@Column(name = "estado_reserva", length = 1, nullable = false)
 	private String estado;
+	
+	@Column(name = "puntuacion_reserva", length = 1, nullable = false)
+	private Integer puntuacion;
 
 	public Long getId() {
 		return id;
@@ -100,5 +103,13 @@ public class Reserva {
 
 	public Plaza getPlaza() {
 		return plaza;
+	}
+
+	public Integer getPuntuacion() {
+		return puntuacion;
+	}
+
+	public void setPuntuacion(Integer puntuacion) {
+		this.puntuacion = puntuacion;
 	}
 }
