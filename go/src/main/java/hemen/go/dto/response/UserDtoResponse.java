@@ -77,6 +77,7 @@ public class UserDtoResponse {
     	this.apellidosPersona=usuario.getApellidos_persona();
     	this.dniPersona=usuario.getDni_persona();
     	this.ibanPersona=usuario.getIban_persona();
+    	this.emailPersona=usuario.getEmailPersona();
     	this.fecNacimientoPersona=usuario.getFec_nacimiento_persona();
     	if(null!=usuario.getEmpresa()){
     		this.empresaNombre=usuario.getEmpresa().getNombreEmpresa();
