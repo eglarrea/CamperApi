@@ -200,7 +200,8 @@ public class ReservaService {
      */
     public Reserva getReservaByIdAndUsuarioEmail(Long idReserva, String emailUsuario) {
         Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() ->  new UsernameNotFoundException(
+                        messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
         return reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
                 .orElseThrow(() -> new NoSuchElementException("Reserva no encontrada"));

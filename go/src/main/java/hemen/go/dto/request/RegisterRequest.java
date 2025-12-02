@@ -2,6 +2,7 @@ package hemen.go.dto.request;
 
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
+import hemen.go.dto.request.validate.OnCreate;
 
 /**
  * DTO (Data Transfer Object) para la petición de registro de usuarios.
@@ -59,10 +60,10 @@ public class RegisterRequest {
     @Email(message = "{user.email.invalid}")
     private String emailPersona;
 
-    @NotBlank(message = "{user.password.required}")
+    @NotBlank(message = "{user.password.required}", groups = OnCreate.class)
     private String passPersona;
 
-    @NotBlank(message = "{user.password.confirm}")
+    @NotBlank(message = "{user.password.confirm}", groups = OnCreate.class)
     private String confirmPassPersona;
 
     private boolean isAdmin;
