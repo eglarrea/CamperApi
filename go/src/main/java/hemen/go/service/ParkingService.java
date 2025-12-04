@@ -137,4 +137,19 @@ public class ParkingService {
         List<Parking> listParking = parkingRepository.findAll();
         return listParking.stream().map(ParkingDtoResponse::new).toList();
     }
+    
+    /**
+     * Busca un parking por su identificador único.
+     *
+     * @param id identificador del parking.
+     * @return objeto {@link ParkingDtoResponse} con la información del parking.
+     * @throws IllegalArgumentException si el parking no existe.
+     */
+    public ParkingDtoResponse findById(Long id) {
+        Parking parking = parkingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        messageSource.getMessage("error.parking.no.existe", null, LocaleContextHolder.getLocale())));
+
+        return new ParkingDtoResponse(parking);
+    }
 }
