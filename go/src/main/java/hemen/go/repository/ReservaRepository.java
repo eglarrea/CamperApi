@@ -100,4 +100,17 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      * @return lista de reservas ordenadas por fecha de alta (más recientes primero).
      */
     List<Reserva> findByPersonaIdOrderByFecAltaDesc(Long usuarioId);
+    
+    /**
+     * Devuelve la media de las puntuaciones de las reservas dado el id de un parking
+     *
+     * 
+     * @param idParking identificador del parking.
+     * 
+     * @return un float con la media de las reservas
+     */
+    @Query("SELECT AVG(r.puntuacion) FROM Reserva r INNER JOIN Plaza p ON r.plaza.id = p.id INNER JOIN Parking par ON p.parking.id = par.id " +
+           "WHERE par.id = :idParking " +
+            "AND r.estado = '1'")
+    Float mediaReservas(@Param("idParking") Long idParking);
 }
