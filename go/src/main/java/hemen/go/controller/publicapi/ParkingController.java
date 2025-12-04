@@ -38,13 +38,13 @@ public class ParkingController {
         this.messageSource = messageSource;
     }
     
-   /* @PostMapping("/find")
+    @PostMapping("/find")
     public ResponseEntity<?>  buscarParking(@RequestBody FilterParkingRequest request) {
         List<ParkingDtoFindResponse> response = parkingService.findParkings(request);
         return ResponseEntity.ok(response);
-    }*/
+    }
     
-    @GetMapping("/parking/{id}")
+    @GetMapping("/{id}")
     @Operation(
         summary = "Obtener todos los parkings",
         description = "Método para obtener todos los parkings dados de alta.",
