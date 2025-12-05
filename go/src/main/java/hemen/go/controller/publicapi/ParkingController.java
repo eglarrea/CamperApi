@@ -58,15 +58,13 @@ public class ParkingController {
         }
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Retorna la lista de parkins"),
+        @ApiResponse(responseCode = "200", description = "Retorna los datos de un parking"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor.")
     })
     public ResponseEntity<?> getParkings(@PathVariable Long id) {
     	
-    	 try {
-         	//TODO VER QUE DATOS NECESITAMOS PARA HACER EL REPONSE 
+    	 try { 
     		 ParkingDtoResponse parking = parkingService.findById(id);
-            // ReservaDtoResponse response = new ReservaDtoResponse(reserva);
              return ResponseEntity.ok(parking);
          } catch (NoSuchElementException e) {
              String mensaje = messageSource.getMessage("error.parking.no.existe", null, LocaleContextHolder.getLocale());
