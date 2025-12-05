@@ -16,6 +16,7 @@ import hemen.go.dto.response.ParkingDtoResponse;
 import hemen.go.entity.Parking;
 import hemen.go.entity.Usuario;
 import hemen.go.repository.ParkingRepository;
+import hemen.go.repository.ReservaRepository;
 import hemen.go.repository.UsuarioRepository;
 import hemen.go.service.specification.ParkingSpecs;
 import hemen.go.validator.FechaValidator;
@@ -45,6 +46,7 @@ public class ParkingService {
     private static final Logger logger = LoggerFactory.getLogger(ParkingService.class);
 
     private final ParkingRepository parkingRepository;
+    private final ReservaRepository reservaRepository;
     private final UsuarioRepository usuarioRepository;
     private final FechaValidator fechaValidator;
     private final MessageSource messageSource;
@@ -58,9 +60,10 @@ public class ParkingService {
      * @param messageSource fuente de mensajes internacionalizados.
      */
     public ParkingService(ParkingRepository parkingRepository, UsuarioRepository usuarioRepository,
-                          FechaValidator fechaValidator, MessageSource messageSource) {
+                          FechaValidator fechaValidator, ReservaRepository reservaRepository, MessageSource messageSource) {
         this.parkingRepository = parkingRepository;
         this.usuarioRepository = usuarioRepository;
+        this.reservaRepository = reservaRepository;
         this.fechaValidator = fechaValidator;
         this.messageSource = messageSource;
     }
@@ -123,9 +126,13 @@ public class ParkingService {
                         .and(ParkingSpecs.conPlazasDisponibles(request.getFechaDesde(), request.getFechaHasta()))
         );
 
-        return parkings.stream()
-                .map(p -> new ParkingDtoFindResponse(p, request.getFechaDesde(), request.getFechaHasta()))
-                .toList();
+        List<ParkingDtoFindResponse> lista= parkings.stream()
+        .map(p -> new ParkingDtoFindResponse(p, request.getFechaDesde(), request.getFechaHasta()))
+        .toList();
+        for (int i=0; i<lista.size();i++) {
+        	lista.get(i).setMedia(reservaRepository.mediaReservas(lista.get(i).getId()));
+        }
+        return lista;
     }
 
     /**
@@ -150,6 +157,8 @@ public class ParkingService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         messageSource.getMessage("error.parking.no.existe", null, LocaleContextHolder.getLocale())));
 
-        return new ParkingDtoResponse(parking);
+        ParkingDtoResponse parkingResponse= new ParkingDtoResponse(parking);
+        parkingResponse.setMedia(reservaRepository.mediaReservas(parkingResponse.getId()));
+        return parkingResponse;
     }
 }

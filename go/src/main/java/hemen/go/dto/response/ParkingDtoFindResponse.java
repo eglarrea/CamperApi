@@ -19,6 +19,7 @@ public class ParkingDtoFindResponse {
 	    private boolean tieneElectricidad;
 	    private boolean tieneResiduales;
 	    private boolean tieneVips;
+	    private Float media;
 	    private List<PlazaResponse> plazas;
 
 	    public ParkingDtoFindResponse(Parking parking, LocalDate fechaDesde, LocalDate fechaHasta) {
@@ -154,5 +155,13 @@ public class ParkingDtoFindResponse {
 
 		public void setPlazas(List<PlazaResponse> plazas) {
 			this.plazas = plazas;
+		}
+
+		public Float getMedia() {
+			return media;
+		}
+
+		public void setMedia(Float media) {
+			this.media = media;
 		}
 }

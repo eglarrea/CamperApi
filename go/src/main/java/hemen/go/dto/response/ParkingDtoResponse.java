@@ -12,6 +12,7 @@ public class ParkingDtoResponse {
 	 private boolean limpiezaAguasResiduales;
 	 private boolean plazasVip;
 	 private Integer numeroPlazas;
+	 private Float media;
 	 private List<PlazaResponse> plazasResponse;
 	 
 	 public ParkingDtoResponse(){}
@@ -111,5 +112,13 @@ public class ParkingDtoResponse {
 
 	public void setPlazasResponse(List<PlazaResponse> plazasResponse) {
 		this.plazasResponse = plazasResponse;
+	}
+
+	public Float getMedia() {
+		return media;
+	}
+
+	public void setMedia(Float media) {
+		this.media = media;
 	}
 }
