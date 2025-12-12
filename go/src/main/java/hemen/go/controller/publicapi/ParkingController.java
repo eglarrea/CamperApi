@@ -46,7 +46,7 @@ public class ParkingController {
     
     @GetMapping("/{id}")
     @Operation(
-        summary = "Obtener todos los parkings",
+        summary = "Obtener los datos del parking por id",
         description = "Método para obtener todos los parkings dados de alta.",
 		parameters = {                    		  
 	          @Parameter(

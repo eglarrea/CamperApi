@@ -16,6 +16,8 @@ public class FilterParkingRequest {
     private Boolean tomaElectricidad;
     private Boolean limpiezaAguasResiduales;
     private Boolean plazasVip;
+    
+    private Long id;
 
     // Getters y Setters
     public LocalDate getFechaDesde() {
@@ -72,5 +74,13 @@ public class FilterParkingRequest {
 
 	public void setProvincia(String provincia) {
 		this.provincia = provincia;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

@@ -12,6 +12,13 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 public class ParkingSpecs {
+	
+	public static Specification<Parking> porId(Long idParking) {
+        return (root, query, cb) ->
+            idParking == null
+                ? cb.conjunction()	
+                : cb.equal(root.get("id"), idParking);
+    }
 
     public static Specification<Parking> porProvincia(String provincia) {
         return (root, query, cb) ->

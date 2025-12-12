@@ -117,13 +117,14 @@ public class ParkingService {
         fechaValidator.validarFechas(request.getFechaDesde(), request.getFechaHasta());
 
         List<Parking> parkings = parkingRepository.findAll(
-                Specification.where(ParkingSpecs.porProvincia(request.getProvincia()))
-                        .and(ParkingSpecs.porMunicipio(request.getLocalidad()))
-                        .and(ParkingSpecs.porActivo(true))
-                        .and(ParkingSpecs.conElectricidad(request.isTomaElectricidad()))
-                        .and(ParkingSpecs.conResiduales(request.isLimpiezaAguasResiduales()))
-                        .and(ParkingSpecs.conVips(request.isPlazasVip()))
-                        .and(ParkingSpecs.conPlazasDisponibles(request.getFechaDesde(), request.getFechaHasta()))
+        	    Specification.where(ParkingSpecs.porId(request.getId()))
+        	        .and(ParkingSpecs.porProvincia(request.getProvincia()))
+        	        .and(ParkingSpecs.porMunicipio(request.getLocalidad()))
+        	        .and(ParkingSpecs.porActivo(true))
+        	        .and(ParkingSpecs.conElectricidad(request.isTomaElectricidad()))
+        	        .and(ParkingSpecs.conResiduales(request.isLimpiezaAguasResiduales()))
+        	        .and(ParkingSpecs.conVips(request.isPlazasVip()))
+        	        .and(ParkingSpecs.conPlazasDisponibles(request.getFechaDesde(), request.getFechaHasta()))
         );
 
         List<ParkingDtoFindResponse> lista= parkings.stream()

@@ -44,13 +44,18 @@ public class ParkingDtoFindResponse {
 	    }
 
 	    private boolean plazaLibre(Plaza plaza, LocalDate fechaDesde, LocalDate fechaHasta) {
-	    	if (fechaDesde == null || fechaHasta == null) {
+	        if (fechaDesde == null || fechaHasta == null) {
 	            return true;
 	        }
+
 	        return plaza.getReservas().stream()
-	            .noneMatch(r -> "1".equals(r.getEstado())
+	            .noneMatch(r -> 
+	                "1".equals(r.getEstado())
+	                && r.getFecInicio() != null
+	                && r.getFecFin() != null
 	                && !r.getFecInicio().isAfter(fechaHasta)
-	                && !r.getFecFin().isBefore(fechaDesde));
+	                && !r.getFecFin().isBefore(fechaDesde)
+	            );
 	    }
 
 		public Long getId() {
