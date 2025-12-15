@@ -169,6 +169,49 @@ public class ReservaService {
         reserva.setEstado("0"); // Cancelada
         reservaRepository.save(reserva);
     }
+    
+    
+    public void puntuarReserve(String email, Long idReserva,Integer puntuacion) {
+    	Usuario user = usuarioRepository.findByEmailPersona(email)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+
+        Reserva reserva = reservaRepository.findByIdAndPersonaId(idReserva, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaFin = reserva.getFecFin();
+
+        // 1. Comprobar que la reserva ya terminó
+        if (hoy.isBefore(fechaFin)) {
+            throw new IllegalArgumentException(messageSource.getMessage(
+                    "error.reserva.no.finalizada",
+                    null,
+                    LocaleContextHolder.getLocale()
+            ));
+        }
+
+        // 2. Comprobar que no ha sido puntuada antes
+        if (reserva.getPuntuacion() != null) {
+            throw new IllegalArgumentException(messageSource.getMessage(
+                    "error.reserva.ya.puntuada",
+                    null,
+                    LocaleContextHolder.getLocale()
+            ));
+        }
+        
+        if (puntuacion < 0 || puntuacion > 10) {
+            throw new IllegalArgumentException(messageSource.getMessage(
+                    "error.reserva.puntuacion.rango",
+                    new Object[]{0, 10},
+                    LocaleContextHolder.getLocale()
+            ));
+        }
+
+        // 3. Guardar la puntuación
+        reserva.setPuntuacion(puntuacion);
+        reservaRepository.save(reserva);
+    }
 
     /**
      * Busca una reserva activa por usuario y su identificador.

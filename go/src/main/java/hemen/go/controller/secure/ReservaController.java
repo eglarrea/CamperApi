@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.zxing.WriterException;
 
 import hemen.go.dto.request.CancelarReservaRequest;
+import hemen.go.dto.request.PuntuarReservaRequest;
 import hemen.go.dto.request.QrRequest;
 import hemen.go.dto.request.ReservaRequest;
 import hemen.go.entity.Reserva;
@@ -176,6 +177,54 @@ public class ReservaController {
     		reservaService.cancelarReserve(userDetails.getUsername(), request.getIdReserva());
     		
     		return ResponseEntity.ok(messageSource.getMessage("message.ok.reserva.cancelada", null, LocaleContextHolder.getLocale()));
+    	} catch (DataIntegrityViolationException ex) {
+    		String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
+    	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
+    	} catch (IllegalArgumentException e) {
+                logger.error("Datos no validos: {}", e.getMessage());  
+                return ResponseEntity.badRequest().body(e.getMessage());
+    	} catch (jakarta.validation.ConstraintViolationException e) {
+    		List<String> errores = e.getConstraintViolations().stream()
+    		    .map(v -> "Campo '" + v.getPropertyPath() + "' " + v.getMessage() + 
+    		            " (valor: " + v.getInvalidValue() + ")").toList();
+    		return ResponseEntity.badRequest().body(errores);
+        }
+    }
+    
+    
+    @PutMapping("/puntuar")
+    @Operation(
+        summary = "Puntuar una reserva",
+        description = "Puntuar la reserva realizada"
+                    + "Si los datos son válidos ",
+        security = { @SecurityRequirement(name = "bearerAuth") },
+        parameters = {                    		  
+            @Parameter(
+          		   name = "Accept-Language",
+                     description = "Idioma de la respuesta (es, en, eu)",
+                     in = ParameterIn.HEADER,
+                     required = false
+          		  )
+          }
+    )
+    @PreAuthorize("hasAnyRole('USER')")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "La reserva se puntua correctamente"),
+        @ApiResponse(responseCode = "400", description = "Solicitud inválida. Los datos enviados no cumplen validaciones"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor durante el registro")
+    })
+    public ResponseEntity<?> PuntutarReservar(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails, @Valid @RequestBody PuntuarReservaRequest request, BindingResult result) {
+    	try {
+    		if (result.hasErrors()) {
+    	        List<String> errores = result.getAllErrors().stream()
+    	            .map(ObjectError::getDefaultMessage)
+    	            .toList();
+    	        return ResponseEntity.badRequest().body(errores);
+    	    }
+    		
+    		reservaService.puntuarReserve(userDetails.getUsername(), request.getIdReserva(),request.getPuntuacion());
+    		
+    		return ResponseEntity.ok(messageSource.getMessage("success.reserva.puntuada", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
     		String mensaje = messageSource.getMessage("error.existe.reserva", null, LocaleContextHolder.getLocale() );
     	    return ResponseEntity.status(HttpStatus.CONFLICT).body(mensaje);
