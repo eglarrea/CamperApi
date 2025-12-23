@@ -115,6 +115,65 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
 		}
 	}
+	
+	/**
+	 * Endpoint POST para login de usuarios administradores.
+	 *
+	 * Flujo: 1. Recibe un objeto LoginRequest con email y contraseña. 2. Llama a
+	 * AuthService.authenticate() para validar credenciales y generar token JWT. 3.
+	 * Recupera los datos del usuario con UserService.findByEmail(). 4. Devuelve un
+	 * objeto JwtResponse con el token y los datos del usuario.
+	 *
+	 * Manejo de errores: - Si las credenciales son inválidas, se captura
+	 * BadCredentialsException. - Se registra el error en el log. - Se devuelve un
+	 * mensaje internacionalizado (auth.invalid.credentials) con estado HTTP 401.
+	 *
+	 * @param request objeto con email y contraseña.
+	 * @return ResponseEntity con JwtResponse si éxito, o mensaje de error si fallo.
+	 */
+	@PostMapping("/admin-login")
+	@Operation(summary = "Login para usuarios administradores", description = "Permite a un usuario administrador autenticarse con su email y contraseña. "
+			+ "Si las credenciales son válidas, devuelve un token JWT junto con los datos del usuario.", parameters = {
+					@Parameter(name = "Accept-Language", description = "Idioma de la respuesta (es, en, eu)", in = ParameterIn.HEADER, required = false) })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Autenticación exitosa. Devuelve token y datos del usuario"),
+			@ApiResponse(responseCode = "400", description = "Solicitud inválida. El cuerpo de la petición no cumple el formato esperado"),
+			@ApiResponse(responseCode = "401", description = "Credenciales incorrectas. No autorizado"),
+			@ApiResponse(responseCode = "500", description = "Error interno del servidor durante la autenticación") })
+
+	public ResponseEntity<?> adminLogin(@RequestBody LoginRequest request) {
+		try {
+			// Autenticación y generación de token
+			String token = authService.authenticate(request.getEmail(), request.getPassword());
+
+			// Recuperar datos del usuario
+			UserDtoResponse user = userService.findByEmail(request.getEmail());
+			if (user.isAdmin()) {
+				return ResponseEntity.ok(new JwtResponse(token, user));
+			} else {
+				// Log de error con credenciales inválidas
+				logger.error("El usuario con credenciales para email: {} y password: {} no es un administrador", request.getEmail(),
+						request.getPassword());
+				// Mensaje internacionalizado según el idioma del cliente
+				String mensaje = messageSource.getMessage("auth.no.admin", null,
+						LocaleContextHolder.getLocale());
+				// Respuesta con estado 401 Unauthorized
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
+			}
+
+			// Retornar token + datos del usuario
+			
+		} catch (BadCredentialsException e) {
+			// Log de error con credenciales inválidas
+			logger.error("Credenciales no válidas para email: {} y password: {}", request.getEmail(),
+					request.getPassword());
+			// Mensaje internacionalizado según el idioma del cliente
+			String mensaje = messageSource.getMessage("auth.invalid.credentials", null,
+					LocaleContextHolder.getLocale());
+			// Respuesta con estado 401 Unauthorized
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
+		}
+	}
 
 	@PostMapping("/register")
 	@Operation(summary = "Registrarse en la aplicación", description = "Permite a un nuevo usuario registrarse en la aplicación enviando sus datos personales. "
