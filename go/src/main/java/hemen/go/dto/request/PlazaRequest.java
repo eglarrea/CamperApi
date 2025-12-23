@@ -2,26 +2,26 @@ package hemen.go.dto.request;
 
 public class PlazaRequest {
     private String nombre;
-    private boolean esVip;
-    private boolean tieneElectricidad;
+    private Boolean esVip;
+    private Boolean tieneElectricidad;
     private String estado;
-    private float precio;
+    private Float precio;
 	public String getNombre() {
 		return nombre;
 	}
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public boolean isEsVip() {
+	public Boolean isEsVip() {
 		return esVip;
 	}
-	public void setEsVip(boolean esVip) {
+	public void setEsVip(Boolean esVip) {
 		this.esVip = esVip;
 	}
-	public boolean isTieneElectricidad() {
+	public Boolean isTieneElectricidad() {
 		return tieneElectricidad;
 	}
-	public void setTieneElectricidad(boolean tieneElectricidad) {
+	public void setTieneElectricidad(Boolean tieneElectricidad) {
 		this.tieneElectricidad = tieneElectricidad;
 	}
 	public String getEstado() {
@@ -30,10 +30,10 @@ public class PlazaRequest {
 	public void setEstado(String estado) {
 		this.estado = estado;
 	}
-	public float getPrecio() {
+	public Float getPrecio() {
 		return precio;
 	}
-	public void setPrecio(float precio) {
+	public void setPrecio(Float precio) {
 		this.precio = precio;
 	}
 

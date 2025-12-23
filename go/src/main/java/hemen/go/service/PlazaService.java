@@ -178,11 +178,31 @@ public class PlazaService {
             throw new IllegalArgumentException("La plaza no pertenece al parking especificado");
         }
 
-        plaza.setNombre(request.getNombre());
+       /* plaza.setNombre(request.getNombre());
         plaza.setEsVip(request.isEsVip());
         plaza.setTieneElectricidad(request.isTieneElectricidad());
         plaza.setEstado(EstadoPlaza.fromCodigo(request.getEstado()));
-        plaza.setPrecio(request.getPrecio());
+        plaza.setPrecio(request.getPrecio());*/
+        
+        if (request.getNombre() != null) {
+            plaza.setNombre(request.getNombre());
+        }
+
+        if (request.isEsVip() != null) { // si es Boolean en vez de boolean
+            plaza.setEsVip(request.isEsVip());
+        }
+
+        if (request.isTieneElectricidad() != null) {
+            plaza.setTieneElectricidad(request.isTieneElectricidad());
+        }
+
+        if (request.getEstado() != null) {
+            plaza.setEstado(EstadoPlaza.fromCodigo(request.getEstado()));
+        }
+
+        if (request.getPrecio() != null) {
+            plaza.setPrecio(request.getPrecio());
+        }
 
         Plaza updated = plazaRepository.save(plaza);
         return new PlazaResponse(updated);
