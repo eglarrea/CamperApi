@@ -63,6 +63,6 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> , JpaSpe
      * @return lista de parkings pertenecientes a la empresa.
      */
 	List<Parking> findByEmpresa_Id(Long idEmpresa);
-	
-	
+	Parking findByIdAndEmpresaId(Long idParking, Long idEmpresa);
+		
 }

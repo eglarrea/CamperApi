@@ -11,8 +11,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import hemen.go.dto.request.FilterParkingRequest;
+import hemen.go.dto.request.ParkingRequest;
+import hemen.go.dto.request.ParkingUpdateRequest;
 import hemen.go.dto.response.ParkingDtoFindResponse;
 import hemen.go.dto.response.ParkingDtoResponse;
+import hemen.go.entity.Empresa;
 import hemen.go.entity.Parking;
 import hemen.go.entity.Usuario;
 import hemen.go.repository.ParkingRepository;
@@ -96,6 +99,43 @@ public class ParkingService {
         List<Parking> parking = parkingRepository.findByEmpresa_Id(user.getEmpresa().getId().longValue());
         return parking.stream().map(ParkingDtoResponse::new).toList();
     }
+    
+    /**
+     * Obtiene el parking asociado a la empresa de un usuario.
+     *
+     * <p>Flujo:</p>
+     * <ol>
+     *   <li>Busca el usuario por su email.</li>
+     *   <li>Verifica que el usuario tenga una empresa asociada.</li>
+     *   <li>Obtiene el  parkings vinculados a la empresa.</li>
+     *   <li>Transforma las entidades en DTOs de respuesta.</li>
+     * </ol>
+     *
+     * @param email correo electrónico del usuario.
+     * @param id del parking.
+     * @return  {@link ParkingDtoResponse} con los parkings de la empresa.
+     * @throws UsernameNotFoundException si el usuario no existe o no tiene empresa asociada.
+     * @throws RuntimeException si el parking no existe o esta asociada a la empresa.
+     */
+    public ParkingDtoResponse findByCompanyIdAndId(String email, Long id) {
+        Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
+                messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+
+        if (user.getEmpresa() == null || user.getEmpresa().getId() == null) {
+            logger.error("El usuario con email " + email + " no tiene empresa asociada");
+            throw new UsernameNotFoundException(
+                    messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale()));
+        }
+
+        Parking parking = parkingRepository.findByIdAndEmpresaId(id, user.getEmpresa().getId().longValue());
+        if (parking == null) {
+        	throw new RuntimeException(
+                    messageSource.getMessage("error.parking.no.existe", null, LocaleContextHolder.getLocale()));
+        }
+        
+        ParkingDtoResponse response = new ParkingDtoResponse(parking);
+        return response;
+    }
 
     /**
      * Busca parkings aplicando filtros avanzados.
@@ -161,5 +201,94 @@ public class ParkingService {
         ParkingDtoResponse parkingResponse= new ParkingDtoResponse(parking);
         parkingResponse.setMedia(reservaRepository.mediaReservas(parkingResponse.getId()));
         return parkingResponse;
+    }
+    
+    public void crear(String email, ParkingRequest request) {
+        Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
+                messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+
+        Empresa empresa = new Empresa(); empresa.setId(user.getEmpresa().getId());
+      
+        Parking parking = new Parking();
+        parking.setEmpresa(empresa);
+       
+        parking.setEmail(request.getEmailParking());
+        parking.setMunicipio(request.getMunicipioParking());
+        parking.setNombre(request.getNombreParking());
+        parking.setPersonaContacto(request.getPersonaContactoParking());
+        parking.setProvincia(request.getProvinciaParking());
+        parking.setTelefono(request.getTelefonoParking());
+        
+        parking.setActivo(false);
+        if (request.getIsActivoParking() != null) {
+        	parking.setTieneElectricidad(request.getIsActivoParking());
+        }
+        
+        if (request.getTieneElectricidadParking() != null) {
+        	parking.setTieneElectricidad(request.getTieneElectricidadParking());
+        }
+        if (request.getTienePlazasVipParking() != null) {
+        	parking.setTieneVips(request.getTienePlazasVipParking());
+        }
+        if (request.getTieneResidualesParking() != null) {
+        	parking.setTieneResiduales(request.getTieneResidualesParking());
+        }
+        
+        parkingRepository.save(parking);
+    }
+    
+    
+    public void update(String email, ParkingUpdateRequest request) {
+        Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
+                messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
+
+        Empresa empresa = new Empresa(); empresa.setId(user.getEmpresa().getId());
+        Parking parking = parkingRepository.findByIdAndEmpresaId(request.getIdParking(),user.getEmpresa().getId());
+      
+        if (parking == null) {
+        	throw new RuntimeException(
+                    messageSource.getMessage("error.parking.no.existe", null, LocaleContextHolder.getLocale()));
+        }
+        
+        parking.setEmpresa(empresa);
+       
+        if (request.getEmailParking() != null) {
+        	 parking.setEmail(request.getEmailParking());
+        }
+        
+        if (request.getMunicipioParking() != null) {
+       	 parking.setMunicipio(request.getMunicipioParking());
+        }
+        if (request.getNombreParking() != null) {
+          	 parking.setNombre(request.getNombreParking());
+        }
+        
+        if (request.getPersonaContactoParking() != null) {
+         	 parking.setPersonaContacto(request.getPersonaContactoParking());
+        }
+        
+        if (request.getProvinciaParking() != null) {
+        	 parking.setProvincia(request.getProvinciaParking());
+        }
+        
+        if (request.getTelefonoParking() != null) {
+        	 parking.setTelefono(request.getTelefonoParking());
+        }
+               
+        if (request.getIsActivoParking() != null) {
+        	parking.setTieneElectricidad(request.getIsActivoParking());
+        }
+        
+        if (request.getTieneElectricidadParking() != null) {
+        	parking.setTieneElectricidad(request.getTieneElectricidadParking());
+        }
+        if (request.getTienePlazasVipParking() != null) {
+        	parking.setTieneVips(request.getTienePlazasVipParking());
+        }
+        if (request.getTieneResidualesParking() != null) {
+        	parking.setTieneResiduales(request.getTieneResidualesParking());
+        }
+        
+        parkingRepository.save(parking);
     }
 }
