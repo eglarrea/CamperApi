@@ -101,9 +101,19 @@ public class AuthController {
 
 			// Recuperar datos del usuario
 			UserDtoResponse user = userService.findByEmail(request.getEmail());
-
-			// Retornar token + datos del usuario
-			return ResponseEntity.ok(new JwtResponse(token, user));
+			
+			if (!user.isAdmin()) {
+				return ResponseEntity.ok(new JwtResponse(token, user));
+			} else {
+				// Log de error con credenciales inválidas
+				logger.error("El usuario con credenciales para email: {} y password: {} no es un usuario", request.getEmail(),
+						request.getPassword());
+				// Mensaje internacionalizado según el idioma del cliente
+				String mensaje = messageSource.getMessage("auth.invalid.credentials", null,
+						LocaleContextHolder.getLocale());
+				// Respuesta con estado 401 Unauthorized
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
+			}
 		} catch (BadCredentialsException e) {
 			// Log de error con credenciales inválidas
 			logger.error("Credenciales no válidas para email: {} y password: {}", request.getEmail(),
