@@ -138,7 +138,7 @@ public class ReservaController {
      
             return ResponseEntity.ok(reserva);
         } catch (NoSuchElementException e) {
-        	logger.error("Error al obtener el detalle de la reserver:"+e);
+        	logger.error("Error al obtener el detalle de la reserva "+id+":"+e);
             String mensaje = messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensaje);
         }
