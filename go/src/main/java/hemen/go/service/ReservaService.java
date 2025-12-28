@@ -230,7 +230,7 @@ public class ReservaService {
         Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
                 messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
         return reservaRepository.findReservaActiva(user.getId(), idReserva)
-                .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
+                .orElseThrow(() -> new IllegalArgumentException(messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale())));
     }
 
     /**
@@ -248,7 +248,7 @@ public class ReservaService {
                         messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
         return reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
-                .orElseThrow(() -> new NoSuchElementException("Reserva no encontrada"));
+                .orElseThrow(() -> new NoSuchElementException(messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale())));
     }
 
     /**
