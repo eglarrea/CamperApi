@@ -142,7 +142,7 @@ public class ReservaService {
      * @throws IllegalArgumentException si la reserva no existe, no está activa
      *                                  o no cumple la política de cancelación.
      */
-    public void cancelarReserve(String email, Long idReserva) {
+    public void cancelarReserva(String email, Long idReserva) {
         Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
                 messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
@@ -159,6 +159,7 @@ public class ReservaService {
         boolean cumpleReciente = ChronoUnit.DAYS.between(fechaAlta, hoy) <= diasCancelacion;
 
         if (!(cumpleAntelacion || cumpleReciente)) {
+        	logger.error("No se puede cancelar cumpleAntelacion:" + cumpleAntelacion +" cumpleReciente:"+cumpleReciente);
             throw new IllegalArgumentException(messageSource.getMessage(
                     "error.reserva.cancelacion",
                     new Object[]{diasCancelacion, diasCancelacion},

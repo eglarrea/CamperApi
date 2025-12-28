@@ -133,12 +133,12 @@ public class ReservaController {
     public ResponseEntity<?> getReservaDetalle(
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
             @PathVariable Long id) {
-        try {
-        	//TODO VER QUE DATOS NECESITAMOS PARA HACER EL REPONSE 
+        try { 
             Reserva reserva = reservaService.getReservaByIdAndUsuarioEmail(id, userDetails.getUsername());
-           // ReservaDtoResponse response = new ReservaDtoResponse(reserva);
+     
             return ResponseEntity.ok(reserva);
         } catch (NoSuchElementException e) {
+        	logger.error("Error al obtener el detalle de la reserver:"+e);
             String mensaje = messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensaje);
         }
@@ -174,7 +174,7 @@ public class ReservaController {
     	        return ResponseEntity.badRequest().body(errores);
     	    }
     		
-    		reservaService.cancelarReserve(userDetails.getUsername(), request.getIdReserva());
+    		reservaService.cancelarReserva(userDetails.getUsername(), request.getIdReserva());
     		
     		return ResponseEntity.ok(messageSource.getMessage("message.ok.reserva.cancelada", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {
