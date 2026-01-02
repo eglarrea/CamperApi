@@ -24,14 +24,14 @@ public class ParkingSpecs {
         return (root, query, cb) ->
             provincia == null || provincia.isBlank()
                 ? cb.conjunction()
-                : cb.equal(cb.lower(root.get("provincia")), provincia.trim().toLowerCase());
+                		: cb.like( cb.lower(root.get("provincia")), "%" + provincia.trim().toLowerCase() + "%" );
     }
 
     public static Specification<Parking> porMunicipio(String municipio) {
         return (root, query, cb) ->
             municipio == null || municipio.isBlank()
                 ? cb.conjunction()
-                : cb.equal(cb.lower(root.get("municipio")), municipio.trim().toLowerCase());
+                		: cb.like( cb.lower(root.get("municipio")), "%" + municipio.trim().toLowerCase() + "%" );
     }
 
     public static Specification<Parking> porActivo(Boolean activo) {
