@@ -10,6 +10,7 @@ public class ReservaResponse {
 	private Long plazaId;
 	private Long parkingId;
 	private String parkingNombre;
+	private String plazaNombre;
 	private float precio;
 	private float precioTotal;
 	private LocalDate fecInicio;
@@ -30,6 +31,7 @@ public class ReservaResponse {
 		if (reserva.getPlaza() != null) {
 			this.plazaId = reserva.getPlaza().getId();
 			this.precio = reserva.getPlaza().getPrecio();
+			this.plazaNombre = reserva.getPlaza().getNombre();
 			if (reserva.getPlaza().getParking() != null) {
 				this.parkingId = reserva.getPlaza().getParking().getId();
 				this.parkingNombre = reserva.getPlaza().getParking().getNombre();
@@ -117,6 +119,10 @@ public class ReservaResponse {
 				+ ", plazaId=" + plazaId + ", parkingId=" + parkingId + ", parkingNombre='" + parkingNombre + '\''
 				+ ", precio=" + precio + ", precioTotal=" + precioTotal + ", fecInicio=" + fecInicio + ", fecFin="
 				+ fecFin + ", fecAlta=" + fecAlta + ", estado='" + estado+ ", puntuacion='" + puntuacion + '\'' + '}';
+	}
+
+	public String getPlazaNombre() {
+		return plazaNombre;
 	}
 
 
