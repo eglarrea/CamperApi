@@ -222,7 +222,7 @@ public class ReservaController {
     	        return ResponseEntity.badRequest().body(errores);
     	    }
     		
-    		reservaService.puntuarReserve(userDetails.getUsername(), request.getIdReserva(),request.getPuntuacion());
+    		reservaService.puntuarReserva(userDetails.getUsername(), request.getIdReserva(),request.getPuntuacion());
     		
     		return ResponseEntity.ok(messageSource.getMessage("success.reserva.puntuada", null, LocaleContextHolder.getLocale()));
     	} catch (DataIntegrityViolationException ex) {

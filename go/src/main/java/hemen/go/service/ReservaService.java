@@ -188,7 +188,7 @@ public class ReservaService {
     }
     
     
-    public void puntuarReserve(String email, Long idReserva,Integer puntuacion) {
+    public void puntuarReserva(String email, Long idReserva,Integer puntuacion) {
     	Usuario user = usuarioRepository.findByEmailPersona(email)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
