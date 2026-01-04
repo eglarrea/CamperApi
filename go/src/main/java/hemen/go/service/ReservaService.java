@@ -148,7 +148,7 @@ public class ReservaService {
         Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
                 messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
-        Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado(idReserva, user.getId(), EstadoReserva.ACTIVA.getCodigo())
+        Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado(idReserva, user.getId(), EstadoReserva.ACTIVA)
                 .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 
         LocalDate hoy = LocalDate.now();

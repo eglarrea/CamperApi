@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import hemen.go.entity.Reserva;
+import hemen.go.enums.EstadoReserva;
 
 /**
  * Repositorio JPA para la entidad {@link Reserva}.
@@ -77,7 +78,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      * @param estado estado de la reserva (ej. "1" activa, "0" cancelada).
      * @return un {@link Optional} con la reserva si existe.
      */
-    Optional<Reserva> findByIdAndPersonaIdAndEstado(Long idReserva, Long idUsuario, String estado);
+    Optional<Reserva> findByIdAndPersonaIdAndEstado(Long idReserva, Long idUsuario, EstadoReserva estado);
+
 
     /**
      * Busca una reserva por su ID y el ID del usuario.
