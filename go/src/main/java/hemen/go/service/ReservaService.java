@@ -155,17 +155,33 @@ public class ReservaService {
 
         logger.error("Dias cancelacion=" + diasCancelacion);
 
+     // 1. No permitir cancelar si la estancia es hoy o ya ha comenzado
+        if (!hoy.isBefore(fechaInicio)) {
+            logger.error("No se puede cancelar porque la estancia es hoy o ya ha comenzado");
+            throw new IllegalArgumentException(
+                messageSource.getMessage(
+                    "error.reserva.estancia.iniciada",
+                    null,
+                    LocaleContextHolder.getLocale()
+                )
+            );
+        }
+
+        // 2. Reglas de cancelación
         boolean cumpleAntelacion = hoy.plusDays(diasCancelacion).isBefore(fechaInicio);
         boolean cumpleReciente = ChronoUnit.DAYS.between(fechaAlta, hoy) <= diasCancelacion;
 
         if (!(cumpleAntelacion || cumpleReciente)) {
-        	logger.error("No se puede cancelar cumpleAntelacion:" + cumpleAntelacion +" cumpleReciente:"+cumpleReciente);
-            throw new IllegalArgumentException(messageSource.getMessage(
+            logger.error("No se puede cancelar cumpleAntelacion:" + cumpleAntelacion +" cumpleReciente:"+cumpleReciente);
+            throw new IllegalArgumentException(
+                messageSource.getMessage(
                     "error.reserva.cancelacion",
                     new Object[]{diasCancelacion, diasCancelacion},
                     LocaleContextHolder.getLocale()
-            ));
+                )
+            );
         }
+
 
         reserva.setEstado("0"); // Cancelada
         reservaRepository.save(reserva);
