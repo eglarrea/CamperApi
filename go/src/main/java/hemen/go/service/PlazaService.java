@@ -177,12 +177,6 @@ public class PlazaService {
         if (!plaza.getParking().getId().equals(parking.getId())) {
             throw new IllegalArgumentException("La plaza no pertenece al parking especificado");
         }
-
-       /* plaza.setNombre(request.getNombre());
-        plaza.setEsVip(request.isEsVip());
-        plaza.setTieneElectricidad(request.isTieneElectricidad());
-        plaza.setEstado(EstadoPlaza.fromCodigo(request.getEstado()));
-        plaza.setPrecio(request.getPrecio());*/
         
         if (request.getNombre() != null) {
             plaza.setNombre(request.getNombre());
