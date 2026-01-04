@@ -89,6 +89,7 @@ public class Reserva {
 	public EstadoReserva getEstado() {
 		return estado;
 	}
+	
 
 	public void setEstado(EstadoReserva estado) {
 		this.estado = estado;

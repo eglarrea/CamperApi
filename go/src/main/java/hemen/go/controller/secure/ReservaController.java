@@ -32,6 +32,7 @@ import hemen.go.dto.request.CancelarReservaRequest;
 import hemen.go.dto.request.PuntuarReservaRequest;
 import hemen.go.dto.request.QrRequest;
 import hemen.go.dto.request.ReservaRequest;
+import hemen.go.dto.response.ReservaResponse;
 import hemen.go.entity.Reserva;
 import hemen.go.service.ReservaService;
 import hemen.go.service.TokenReservaService;
@@ -134,7 +135,7 @@ public class ReservaController {
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
             @PathVariable Long id) {
         try { 
-            Reserva reserva = reservaService.getReservaByIdAndUsuarioEmail(id, userDetails.getUsername());
+        	ReservaResponse reserva = reservaService.getReservaByIdAndUsuarioEmail(id, userDetails.getUsername());
      
             return ResponseEntity.ok(reserva);
         } catch (NoSuchElementException e) {

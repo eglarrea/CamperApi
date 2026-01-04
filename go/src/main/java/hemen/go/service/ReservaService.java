@@ -183,7 +183,7 @@ public class ReservaService {
                 )
             );
         }
-
+       
 
         reserva.setEstado(EstadoReserva.CANCELADA); // Cancelada
         reservaRepository.save(reserva);
@@ -260,13 +260,14 @@ public class ReservaService {
      * @throws UsernameNotFoundException si el usuario no existe.
      * @throws NoSuchElementException si no se encuentra la reserva para ese usuario.
      */
-    public Reserva getReservaByIdAndUsuarioEmail(Long idReserva, String emailUsuario) {
+    public ReservaResponse getReservaByIdAndUsuarioEmail(Long idReserva, String emailUsuario) {
         Usuario usuario = usuarioRepository.findByEmailPersona(emailUsuario)
                 .orElseThrow(() ->  new UsernameNotFoundException(
                         messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
-        return reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
+        Reserva reserva = reservaRepository.findByIdAndPersonaId(idReserva, usuario.getId())
                 .orElseThrow(() -> new NoSuchElementException(messageSource.getMessage("error.reserva.no.existe", null, LocaleContextHolder.getLocale())));
+        return new ReservaResponse(reserva);
     }
 
     /**
