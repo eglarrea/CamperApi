@@ -1,12 +1,11 @@
 package hemen.go.service.specification;
 
-import org.springframework.data.jpa.domain.Specification;
-
 import java.time.LocalDate;
+
+import org.springframework.data.jpa.domain.Specification;
 
 import hemen.go.entity.Plaza;
 import hemen.go.entity.Reserva;
-import hemen.go.enums.EstadoReserva;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 
@@ -60,7 +59,7 @@ public class PlazaSpecs {
             subquery.select(reservaRoot.get("id"))
                     .where(
                         cb.equal(reservaRoot.get("plaza"), root),
-                        cb.equal(reservaRoot.get("estado"), EstadoReserva.ACTIVA.getCodigo()), // solo reservas activas
+                        cb.equal(reservaRoot.get("estado"), "1"), // solo reservas activas
                         cb.lessThanOrEqualTo(reservaRoot.get("fecInicio"), fechaFin),
                         cb.greaterThanOrEqualTo(reservaRoot.get("fecFin"), fechaInicio)
                     );

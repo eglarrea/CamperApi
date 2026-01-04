@@ -41,7 +41,7 @@ public class ReservaResponse {
 		this.fecInicio = reserva.getFecInicio();
 		this.fecFin = reserva.getFecFin();
 		this.fecAlta = reserva.getFecAlta();
-		this.estado = reserva.getEstado() != null ? reserva.getEstado().getCodigo() : null;
+		this.estado = reserva.getEstado();
 		this.puntuacion = reserva.getPuntuacion();
 
 		// Calcular precioTotal = precio * número de días

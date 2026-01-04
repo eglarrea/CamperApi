@@ -4,11 +4,7 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import hemen.go.enums.EstadoPlaza;
-import hemen.go.enums.EstadoReserva;
-import hemen.go.enums.converter.EstadoReservaConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -47,9 +43,8 @@ public class Reserva {
 	@Column(name = "fecha_alta_reserva")
 	private LocalDate fecAlta;
 
-	@Convert(converter = EstadoReservaConverter.class)
-    @Column(name = "estado_reserva", length = 1, nullable = false)
-    private EstadoReserva estado;
+	@Column(name = "estado_reserva", length = 1, nullable = false)
+	private String estado;
 	
 	@Column(name = "puntuacion_reserva", length = 1, nullable = false)
 	private Integer puntuacion;
@@ -86,12 +81,12 @@ public class Reserva {
 		this.fecAlta = fecAlta;
 	}
 
-	public EstadoReserva getEstado() {
+	public String getEstado() {
 		return estado;
 	}
 	
 
-	public void setEstado(EstadoReserva estado) {
+	public void setEstado(String estado) {
 		this.estado = estado;
 	}
 

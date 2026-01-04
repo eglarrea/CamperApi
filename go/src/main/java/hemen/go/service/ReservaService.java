@@ -19,8 +19,6 @@ import hemen.go.entity.Parking;
 import hemen.go.entity.Plaza;
 import hemen.go.entity.Reserva;
 import hemen.go.entity.Usuario;
-import hemen.go.enums.EstadoPlaza;
-import hemen.go.enums.EstadoReserva;
 import hemen.go.repository.ReservaRepository;
 import hemen.go.repository.UsuarioRepository;
 import hemen.go.validator.FechaValidator;
@@ -121,7 +119,7 @@ public class ReservaService {
 
         reserva.setPersona(user);
         reserva.setPlaza(plaza);
-        reserva.setEstado(EstadoReserva.ACTIVA); // Activa
+        reserva.setEstado("1");
         reserva.setFecInicio(request.getFecInicio());
         reserva.setFecFin(request.getFecFin());
         reserva.setFecAlta(LocalDate.now());
@@ -148,7 +146,7 @@ public class ReservaService {
         Usuario user = usuarioRepository.findByEmailPersona(email).orElseThrow(() -> new UsernameNotFoundException(
                 messageSource.getMessage("error.usuario.no.existe", null, LocaleContextHolder.getLocale())));
 
-        Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado(idReserva, user.getId(), EstadoReserva.ACTIVA)
+        Reserva reserva = reservaRepository.findByIdAndPersonaIdAndEstado(idReserva, user.getId(), "1")
                 .orElseThrow(() -> new IllegalArgumentException("No existe la reserva con esos datos"));
 
         LocalDate hoy = LocalDate.now();
@@ -185,7 +183,7 @@ public class ReservaService {
         }
        
 
-        reserva.setEstado(EstadoReserva.CANCELADA); // Cancelada
+        reserva.setEstado("0"); // Cancelada
         reservaRepository.save(reserva);
     }
     

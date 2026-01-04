@@ -7,7 +7,6 @@ import hemen.go.entity.Parking;
 import hemen.go.entity.Plaza;
 import hemen.go.entity.Reserva;
 import hemen.go.enums.EstadoPlaza;
-import hemen.go.enums.EstadoReserva;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -77,7 +76,7 @@ public class ParkingSpecs {
             subquery.select(reservaRoot.get("id"))
                     .where(
                         cb.equal(reservaRoot.get("plaza"), plazas),
-                        cb.equal(reservaRoot.get("estado"), EstadoReserva.ACTIVA.getCodigo()), // solo reservas activas
+                        cb.equal(reservaRoot.get("estado"), "1"),  // solo reservas activas
                         cb.lessThanOrEqualTo(reservaRoot.get("fecInicio"), fechaFin),
                         cb.greaterThanOrEqualTo(reservaRoot.get("fecFin"), fechaInicio)
                     );
