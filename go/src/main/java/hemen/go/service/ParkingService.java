@@ -274,9 +274,13 @@ public class ParkingService {
         if (request.getTelefonoParking() != null) {
         	 parking.setTelefono(request.getTelefonoParking());
         }
+        
+        if (request.getWebParking() != null) {
+        	parking.setWeb(request.getWebParking());
+        }
                
         if (request.getIsActivoParking() != null) {
-        	parking.setTieneElectricidad(request.getIsActivoParking());
+        	parking.setActivo(request.getIsActivoParking());
         }
         
         if (request.getTieneElectricidadParking() != null) {

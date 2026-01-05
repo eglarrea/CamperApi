@@ -16,6 +16,7 @@ public class ParkingDtoResponse {
 	 private boolean limpiezaAguasResiduales;
 	 private boolean plazasVip;
 	 private Integer numeroPlazas;
+	 private boolean isActivoParking;
 	 private Float media;
 	 private List<PlazaResponse> plazasResponse;
 	 
@@ -33,6 +34,7 @@ public class ParkingDtoResponse {
 		 this.web = parking.getWeb();
 	     this.telefono = parking.getTelefono();
 	     this.email = parking.getEmail();
+	     this.isActivoParking= parking.isActivo();
 		 this.numeroPlazas=0;
 		 if (parking.getPlazas() != null && !parking.getPlazas().isEmpty()) {
 	            this.numeroPlazas = parking.getPlazas().size();
@@ -160,5 +162,13 @@ public class ParkingDtoResponse {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public boolean isActivoParking() {
+		return isActivoParking;
+	}
+
+	public void setActivoParking(boolean isActivoParking) {
+		this.isActivoParking = isActivoParking;
 	}
 }
