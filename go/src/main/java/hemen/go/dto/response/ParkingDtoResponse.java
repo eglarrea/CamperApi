@@ -8,6 +8,10 @@ public class ParkingDtoResponse {
 	 private Long id;
 	 private String nombre;
 	 private String localidad;
+	 private String provincia;
+	 private String web;
+	 private String telefono;
+	 private String email;
 	 private boolean tomaElectricidad;
 	 private boolean limpiezaAguasResiduales;
 	 private boolean plazasVip;
@@ -25,6 +29,10 @@ public class ParkingDtoResponse {
 		 this.tomaElectricidad=parking.isTieneElectricidad();
 		 this.nombre= parking.getNombre();
 		 this.localidad=parking.getMunicipio();
+		 this.provincia = parking.getProvincia();
+		 this.web = parking.getWeb();
+	     this.telefono = parking.getTelefono();
+	     this.email = parking.getEmail();
 		 this.numeroPlazas=0;
 		 if (parking.getPlazas() != null && !parking.getPlazas().isEmpty()) {
 	            this.numeroPlazas = parking.getPlazas().size();
@@ -120,5 +128,37 @@ public class ParkingDtoResponse {
 
 	public void setMedia(Float media) {
 		this.media = media;
+	}
+
+	public String getProvincia() {
+		return provincia;
+	}
+
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
+	}
+
+	public String getWeb() {
+		return web;
+	}
+
+	public void setWeb(String web) {
+		this.web = web;
+	}
+
+	public String getTelefono() {
+		return telefono;
+	}
+
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }
